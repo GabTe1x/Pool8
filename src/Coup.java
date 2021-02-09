@@ -7,7 +7,7 @@ public class Coup{
 		y1=y;
 		x2=w;
 		y2=z;
-		f=calculForce();
+		f=calculForce();// vitesse de la bille distance/temps
 	}
 
 	// modélisé par le poid de la bille blanche
