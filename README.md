@@ -1,11 +1,11 @@
 # PoolGame
 
-The poolGame is a model of the American pool
+Un jeu de billard inspiré du billard americain
 
 ## Installation
 
-not yet
+Pas encore programmé
 
 ## Usage 
 
-not yet
+Jeu à deux joueurs sur le même ordinateurs au tour par tour
