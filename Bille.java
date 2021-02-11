@@ -36,18 +36,4 @@ public class Bille {
 	
 		
 
-	//utiliser Point(x,y) , Point départ , Point arrivé
-	//coord de départ et d'arrivée (4 arrivés )
-	//(pour voir si il y a eu un déplacement .. )
-
-	// fonction abstract peuttaper() boolean 
-	// fonction abstract peutValider() boolean 
-	
-	//fonction abstraite en mouvement ; 
-	
-	
-	//enum à voir( internet )
-	
-	// pour la plateau (créer une classe Coin (point p)
-	
 }
