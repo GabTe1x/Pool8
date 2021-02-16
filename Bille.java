@@ -1,20 +1,59 @@
 import java.awt.Color;
 import java.awt.Point;
-
 public class Bille {
-	private int x ;
-	private int y ;
-	private int poids;
+	private double x, y ; // position de la balle
+	private double vx ,xy ; //vitesse 
+	private double masse;
+	private double rayon ;  
 	private Color couleur;
 	private boolean mouv;
 	 
 	
 	
-	public Bille(int x , int y  , int poids ,Color couleur) {
+	public Bille(double x , double y  , double m , double rayon ,Color couleur , boolean mouv) {
 		this.x=x;
 		this.y=y;
-		this.poids=poids;
+		this.masse=m;
+		this.rayon=rayon;
 		this.couleur =couleur;
+		mouv=false;
+		rayon = 0 ; 
+	}
+	
+	
+	//mets à jour la vitesse de manière à refléter  une collision sur une bande
+	public void colliBande(Direction dir ) {
+		vx 
+	}
+
+	
+	public void setX(int x) {
+		this.x=x;
+	}
+	
+	public void setY(int y) {
+		this.y=y;
+	}
+	
+	public void setRayon(double rayon) {
+		if (rayon > 0 ){
+			this.rayon=rayon;
+	}
+	
+	public void setMasse(double masse) {
+		this.masse=masse;
+	}
+	
+	public void setColor(Color a) {
+		this.couleur = a;
+	}
+	
+	public void setMouvBalle(boolean a) {
+		this.mouv = a ;
+	}
+	
+	public double getRayon() {
+		return this.rayon;
 	}
 	
 	
@@ -25,15 +64,24 @@ public class Bille {
 	public int getY() {
 		return this.y;
 	}
-	
-	public void setX(int x) {
-		this.x=x;
+	public double getMasse() {
+		return this.masse;
+	}
+	public Color getColor() {
+		return this.couleur;
 	}
 	
-	public void setY(int y) {
-		this.y=y;
+	public boolean getMouvBalle() {
+		return this.mouv;
 	}
 	
-		
+	public void colliBalle(Bille autre) {
+		if(autre.getMouvBalle()==false) {
+			
+		}
+	}
+	
 
+	
+	
 }
