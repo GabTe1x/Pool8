@@ -10,7 +10,7 @@ public class Boule {
 	 
 	
 	
-	public Bille(double x , double y  , double m , double rayon ,Color couleur , boolean mouv) {
+	public Boule(double x , double y  , double m , double rayon ,Color couleur , boolean mouv) {
 		this.x=x;
 		this.y=y;
 		this.masse=m;
@@ -42,7 +42,7 @@ public class Boule {
 		this.couleur = a;
 	}
 	
-	public void setMouvBalle(boolean a) {
+	public void setMouvBoule(boolean a) {
 		this.mouv = a ;
 	}
 	
@@ -65,12 +65,12 @@ public class Boule {
 		return this.couleur;
 	}
 	
-	public boolean getMouvBalle() {
+	public boolean getMouvBoule() {
 		return this.mouv;
 	}
 	
-	public void colliBalle(Bille autre) {
-		if(autre.getMouvBalle()==false) {
+	public void colliBalle(Boule autre) {
+		if(autre.getMouvBoule()==false) {
 			
 		}
 	}
