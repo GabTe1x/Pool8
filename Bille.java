@@ -21,12 +21,6 @@ public class Bille {
 	}
 	
 	
-	//mets à jour la vitesse de manière à refléter  une collision sur une bande
-	public void colliBande(Direction dir ) {
-		vx 
-	}
-
-	
 	public void setX(int x) {
 		this.x=x;
 	}
