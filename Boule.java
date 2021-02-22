@@ -1,6 +1,6 @@
 import java.awt.Color;
 import java.awt.Point;
-public class Bille {
+public class Boule {
 	private double x, y ; // position de la balle
 	private double vx ,xy ; //vitesse 
 	private double masse;
