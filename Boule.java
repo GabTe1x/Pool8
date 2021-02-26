@@ -32,6 +32,7 @@ public class Boule {
 	public void setRayon(double rayon) {
 		if (rayon > 0 ){
 			this.rayon=rayon;
+		}
 	}
 	
 	public void setMasse(double masse) {
@@ -51,11 +52,11 @@ public class Boule {
 	}
 	
 	
-	public int getX() {
+	public double getX() {
 		return this.x;
 	}
 	
-	public int getY() {
+	public double getY() {
 		return this.y;
 	}
 	public double getMasse() {
