@@ -1,9 +1,14 @@
-
 public class Joueur {
 	
 	private String pseudo;
 	private int score;
 	private boolean gagne;
+	
+	public Joueur(String pseudo){
+	    this.pseudo=pseudo;
+	    this.score=0;
+	    this.gagne=false;
+	}
 	
 	public String getPseudo() {
 		return pseudo;
