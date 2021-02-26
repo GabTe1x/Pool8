@@ -1,23 +1,24 @@
 import java.awt.Color;
 import java.awt.Point;
-public class Boule {
+public class Bille {
 	private double x, y ; // position de la balle
 	private double vx ,xy ; //vitesse 
-	private double masse;
-	private double rayon ;  
+	private final double masse = 162;
+	private final double rayon = 28.6;  
 	private Color couleur;
 	private boolean mouv;
-	 
+	private boolean rayee; 
 	
 	
-	public Boule(double x , double y  , double m , double rayon ,Color couleur , boolean mouv) {
+	
+
+
+	public Bille(double x , double y  ,Color couleur , boolean mouv, boolean rayee) {
 		this.x=x;
-		this.y=y;
-		this.masse=m;
-		this.rayon=rayon;
+		this.y=y;	
 		this.couleur =couleur;
-		mouv=false;
-		rayon = 0 ; 
+		mouv=false; 
+		this.rayee=rayee;
 	}
 	
 	
@@ -29,21 +30,13 @@ public class Boule {
 		this.y=y;
 	}
 	
-	public void setRayon(double rayon) {
-		if (rayon > 0 ){
-			this.rayon=rayon;
-		}
-	}
 	
-	public void setMasse(double masse) {
-		this.masse=masse;
-	}
 	
 	public void setColor(Color a) {
 		this.couleur = a;
 	}
 	
-	public void setMouvBoule(boolean a) {
+	public void setMouvBille(boolean a) {
 		this.mouv = a ;
 	}
 	
@@ -66,12 +59,20 @@ public class Boule {
 		return this.couleur;
 	}
 	
-	public boolean getMouvBoule() {
+	public boolean getMouvBille() {
 		return this.mouv;
 	}
+	public boolean isRayee() {
+		return rayee;
+	}
+
+
+	public void setRayee(boolean rayee) {
+		this.rayee = rayee;
+	}
 	
-	public void colliBalle(Boule autre) {
-		if(autre.getMouvBoule()==false) {
+	public void colliBalle(Bille autre) {
+		if(autre.getMouvBille()==false) {
 			
 		}
 	}
