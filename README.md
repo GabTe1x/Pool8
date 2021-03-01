@@ -4,7 +4,8 @@ Un jeu de billard inspiré du billard americain
 
 ## Installation
 
-Pas encore programmé
+Se placer dans le dossier du projet dans une console puis taper ./gradlew build
+Puis ./gradlew run
 
 ## Usage 
 
