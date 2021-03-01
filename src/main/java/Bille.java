@@ -66,7 +66,6 @@ public class Bille {
 		return rayee;
 	}
 
-
 	public void setRayee(boolean rayee) {
 		this.rayee = rayee;
 	}
@@ -75,9 +74,5 @@ public class Bille {
 		if(autre.getMouvBille()==false) {
 			
 		}
-	}
-	
-
-	
-	
+	}	
 }

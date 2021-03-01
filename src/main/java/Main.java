@@ -16,6 +16,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+import javafx.animation.TranslateTransition;
 
 public class Main extends Application{
 	
@@ -92,11 +94,26 @@ public class Main extends Application{
             menu_options.setTranslateX(400);
             menu_options.setTranslateY(200);
 
-            int offset = 400;
-            menu_options.setTranslateY(offset);
+            int offset = 800;
+            menu_options.setTranslateX(offset);
 
             MenuButton play = new MenuButton("Play");
             MenuButton options = new MenuButton("Options");
+            options.setOnMouseClicked(e->{
+            	getChildren().add(menu_options);
+            	
+            	TranslateTransition f=new TranslateTransition(Duration.seconds(0.25),menu);
+            	TranslateTransition ff=new TranslateTransition(Duration.seconds(0.5),menu_options);
+            	
+            	f.setToX(menu.getTranslateX()-offset);
+            	ff.setToX(menu.getTranslateX());
+            	f.play();
+            	ff.play();
+            	f.setOnFinished(evt->{
+            		getChildren().remove(menu);
+            	});
+            });
+            
             MenuButton exit = new MenuButton("Exit");
             exit.setOnMouseClicked(e->{
             	System.exit(0);
@@ -104,12 +121,24 @@ public class Main extends Application{
             MenuButton volume = new MenuButton("Volume");
             MenuButton musique = new MenuButton("Musique");
             MenuButton back = new MenuButton("Retour");
-            
+            back.setOnMouseClicked(e->{
+            	getChildren().add(menu);
+            	
+            	TranslateTransition f=new TranslateTransition(Duration.seconds(0.25),menu_options);
+            	TranslateTransition ff=new TranslateTransition(Duration.seconds(0.5),menu);
+            	
+            	f.setToX(menu_options.getTranslateX()+offset);
+            	ff.setToX(menu_options.getTranslateX());
+            	f.play();
+            	ff.play();
+            	f.setOnFinished(evt->{
+            		getChildren().remove(menu_options);
+            	});
+            });
             
             menu_options.getChildren().addAll(volume,musique,back);
             menu.getChildren().addAll(play,options,exit);
             getChildren().addAll(menu);
 		}
 	}
-	
 }
