@@ -1,7 +1,10 @@
+import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -22,7 +25,8 @@ import javafx.animation.TranslateTransition;
 public class Main extends Application{
 	
 	private Menu menu;
-
+	private MediaPlayer mediaPlayer;
+	
 	public static void main(String[] args) {
 		Greeter greeter = new Greeter();
 		System.out.println(greeter.sayHello());
@@ -32,7 +36,6 @@ public class Main extends Application{
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		primaryStage.setTitle("PoolGame");
-
         InputStream s = Files.newInputStream(Paths.get("src/main/ressources/icone.png"));
         Image icon=new Image(s);
         s.close();
@@ -53,7 +56,6 @@ public class Main extends Application{
         root.getChildren().addAll(bgView,menu);
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
-		
 	}
 	private class MenuButton extends StackPane{
         private Text text;
