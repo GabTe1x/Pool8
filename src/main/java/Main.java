@@ -9,9 +9,12 @@ import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -20,12 +23,14 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.animation.FadeTransition;
 import javafx.animation.TranslateTransition;
 
 public class Main extends Application{
 	
 	private Menu menu;
 	private MediaPlayer mediaPlayer;
+	private double volumeM,volumeJ;
 	
 	public static void main(String[] args) {
 		Greeter greeter = new Greeter();
@@ -35,6 +40,17 @@ public class Main extends Application{
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
+		 
+		volumeM=1.0;
+		volumeJ=1.0;
+		Media m =new Media(new File("src/main/ressources/msc.wav").toURI().toString());
+		mediaPlayer=new MediaPlayer(m);
+		mediaPlayer.setOnEndOfMedia(new Runnable() {
+			public void run() {
+				mediaPlayer.seek(Duration.ZERO);
+			}
+		});
+		
 		primaryStage.setTitle("PoolGame");
         InputStream s = Files.newInputStream(Paths.get("src/main/ressources/icone.png"));
         Image icon=new Image(s);
@@ -56,6 +72,7 @@ public class Main extends Application{
         root.getChildren().addAll(bgView,menu);
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
+        mediaPlayer.play();
 	}
 	private class MenuButton extends StackPane{
         private Text text;
@@ -83,22 +100,22 @@ public class Main extends Application{
                 text.setFill(Color.BLACK);
             });
         }
-    }
+    }	
 	private class Menu extends Parent{
 		
 		public Menu(){
             VBox menu = new VBox(10);
             VBox menu_options=new VBox(10);
+            VBox menu_volume=new VBox(10);
 
             menu.setTranslateX(400);
             menu.setTranslateY(200);
 
-            menu_options.setTranslateX(400);
             menu_options.setTranslateY(200);
-
+            
             int offset = 800;
             menu_options.setTranslateX(offset);
-
+            
             MenuButton play = new MenuButton("Play");
             MenuButton options = new MenuButton("Options");
             options.setOnMouseClicked(e->{
@@ -120,8 +137,30 @@ public class Main extends Application{
             exit.setOnMouseClicked(e->{
             	System.exit(0);
             });
-            MenuButton volume = new MenuButton("Volume");
+            MenuButton volumebtn = new MenuButton("Volume");
+            volumebtn.setOnMouseClicked(e->{
+            	getChildren().add(menu_volume);
+            	
+            	FadeTransition f=new FadeTransition(Duration.seconds(0.25),menu_options);
+            	FadeTransition ft=new FadeTransition(Duration.seconds(0.5), menu_volume);
+            	
+            	f.setFromValue(1.0);
+            	f.setToValue(0.0);
+            	ft.setFromValue(0.0);
+            	ft.setToValue(1.0);
+            	
+            	f.play();
+            	ft.play();
+            	f.setOnFinished(evt->getChildren().remove(menu_options));
+            });
+                            
             MenuButton musique = new MenuButton("Musique");
+            musique.setOnMouseClicked(e->{
+            	if(mediaPlayer.getVolume()!=0)
+            		mediaPlayer.setVolume(0);
+            	else mediaPlayer.setVolume(volumeM);
+            		
+            });
             MenuButton back = new MenuButton("Retour");
             back.setOnMouseClicked(e->{
             	getChildren().add(menu);
@@ -138,7 +177,8 @@ public class Main extends Application{
             	});
             });
             
-            menu_options.getChildren().addAll(volume,musique,back);
+            
+            menu_options.getChildren().addAll(volumebtn,musique,back);
             menu.getChildren().addAll(play,options,exit);
             getChildren().addAll(menu);
 		}
