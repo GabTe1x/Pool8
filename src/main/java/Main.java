@@ -30,8 +30,9 @@ public class Main extends Application{
 	private Menu menu;
 	//la musique de fond
 	private MediaPlayer mediaPlayer;
-	//les valeurs pour le volume M pour musique et J pour les sons
-	private double volumeM,volumeJ;
+	//son du jeu
+	private double volume;
+	private boolean b;//monter ou baisser le son
 	
 	public static void main(String[] args) {
 		Greeter greeter = new Greeter();
@@ -42,9 +43,8 @@ public class Main extends Application{
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		
-		//on initialise les valeurs pour le son
-		volumeM=1.0;
-		volumeJ=1.0;
+		//on initialise le son
+		volume=1.0;
 		
 		//on récupére la musique de fond et la joue en boucle jusqu'à la fin du programme
 		Media m =new Media(new File("src/main/ressources/msc.wav").toURI().toString());
@@ -133,17 +133,15 @@ public class Main extends Application{
 			// on crée les 3 menu disponible
             VBox menu = new VBox(10);
             VBox menu_options=new VBox(10);
-            VBox menu_volume=new VBox(10);
 
             //on met leur position
             menu.setTranslateX(400);
             menu.setTranslateY(200);
-
+            
             menu_options.setTranslateY(200);
             // pour qu'il n'apparaisse pas dans l'écran on l'affiche hors de celui-ci
             int offset = 800;
             menu_options.setTranslateX(offset);
-            
             
             //mettra en place la scene pour la partie
             MenuButton play = new MenuButton("Play");
@@ -177,22 +175,19 @@ public class Main extends Application{
             });
             MenuButton volumebtn = new MenuButton("Volume");
             volumebtn.setOnMouseClicked(e->{
-            	getChildren().add(menu_volume);
             	buttonSound();
-            	//animation de transition entre le menu options et le menu Volume
-            	FadeTransition f=new FadeTransition(Duration.seconds(0.25),menu_options);
-            	FadeTransition ft=new FadeTransition(Duration.seconds(0.5), menu_volume);
-            	
-            	//on crée l'animation
-            	f.setFromValue(1.0);
-            	f.setToValue(0.0);
-            	ft.setFromValue(0.0);
-            	ft.setToValue(1.0);
-            	
-            	//on joue l'animation
-            	f.play();
-            	ft.play();
-            	f.setOnFinished(evt->getChildren().remove(menu_options));
+            	if(volume>=1) {
+            		b=true;
+            		volume-=0.2;
+            	}else {
+            		if(volume>0 && b)volume-=0.2;
+            		else {
+            			if(volume<0.1) {
+            				volume+=0.2;
+            				b=false;
+            			}else volume+=0.2;
+            	}}
+            	System.out.println(volume);
             });
             
             // bouton musique
@@ -202,7 +197,7 @@ public class Main extends Application{
             	//désactive ou active le son de la musique selon la valeur du volume
             	if(mediaPlayer.getVolume()!=0)
             		mediaPlayer.setVolume(0);
-            	else mediaPlayer.setVolume(volumeM);
+            	else mediaPlayer.setVolume(volume);
             		
             });
             
@@ -224,7 +219,7 @@ public class Main extends Application{
             	ff.play();
             	f.setOnFinished(evt->{
             		getChildren().remove(menu_options);
-            	});
+            	});            	
             });
             
             // on ajoute les boutons aux menus correspondant
@@ -239,6 +234,7 @@ public class Main extends Application{
 	void buttonSound() {
 		Media m =new Media(new File("src/main/ressources/btn.wav").toURI().toString());
 		MediaPlayer z=new MediaPlayer(m);
+		z.setVolume(volume);
 		z.play();
 	}
 }
