@@ -11,7 +11,7 @@
    <children>
       <ImageView fitHeight="306.0" fitWidth="549.0" layoutX="49.0" layoutY="59.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@TableBillard.png" />
+            <Image url="src/main/ressources/TableBillard.png" />
          </image>
       </ImageView>
       <Circle id="trou1" fill="DODGERBLUE" layoutX="90.0" layoutY="100.0" opacity="0.0" radius="10.0" stroke="BLACK" strokeType="INSIDE" />
