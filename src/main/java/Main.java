@@ -3,6 +3,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import javafx.fxml.FXMLLoader;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.application.Application;
@@ -25,8 +26,9 @@ import javafx.animation.TranslateTransition;
 
 public class Main extends Application{
 
-	
+	Stage window;
 	//menu principale
+	Scene scene,scene2;
 	private Menu menu;
 	//la musique de fond
 	private MediaPlayer mediaPlayer;
@@ -43,6 +45,7 @@ public class Main extends Application{
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		
+		window = primaryStage;
 		//on initialise le son
 		volume=1.0;
 		
@@ -57,16 +60,16 @@ public class Main extends Application{
 		
 		
 		//désactivation du changement de taille de la fenêtre
-		primaryStage.setResizable(false);
+		window.setResizable(false);
 		
 		//initalisationn du titre de la fenêtre
-		primaryStage.setTitle("PoolGame");
+		window.setTitle("PoolGame");
 		
 		//On récupère l'icone de la fenêtre puis on l'ajoute 
         InputStream s = Files.newInputStream(Paths.get("src/main/ressources/icone.png"));
         Image icon=new Image(s);
         s.close();
-        primaryStage.getIcons().add(icon);
+        window.getIcons().add(icon);
 
         //On crée la racine de la fenètre et on fixe une taille de préfèrence
         Pane root=new Pane();
@@ -85,10 +88,13 @@ public class Main extends Application{
 
         //on ajoute le tout à la fenètre
         root.getChildren().addAll(bgView,menu);
+        scene = new Scene(root);
+        Parent game = FXMLLoader.load(getClass().getResource("PoolTable.fxml"));
+        scene2 = new  Scene(game);
         //on met en place la scene
-        primaryStage.setScene(new Scene(root));
+        window.setScene(scene);
         //on montre la scene
-        primaryStage.show();
+        window.show();
         //on joue la musique
         mediaPlayer.play();
 	}
@@ -147,6 +153,8 @@ public class Main extends Application{
             MenuButton play = new MenuButton("Play");
             play.setOnMouseClicked(e->{
             	buttonSound();
+            	window.setScene(scene2);
+            	window.setFullScreen(true);
             });
             MenuButton options = new MenuButton("Options");
             options.setOnMouseClicked(e->{
