@@ -23,10 +23,10 @@ public class Circle {
         this.radius=radius;
         this.id=id;
         if(id==0){
-            setImage("src/resource/white.png");
+            setImage("src/ressources/white.png");
             return;
         }
-        setImage("src/resource/black.png");
+        setImage("src/ressources/black.png");
     }
 
 
