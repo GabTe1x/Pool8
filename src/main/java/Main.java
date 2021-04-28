@@ -3,7 +3,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import javafx.fxml.FXMLLoader;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.application.Application;
@@ -21,7 +20,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import javafx.animation.FadeTransition;
 import javafx.animation.TranslateTransition;
 
 public class Main extends Application{
@@ -89,7 +87,9 @@ public class Main extends Application{
         //on ajoute le tout à la fenètre
         root.getChildren().addAll(bgView,menu);
         scene = new Scene(root);
-        Parent game = FXMLLoader.load(getClass().getResource("PoolTable.fxml"));
+        
+        Plateau game= new Plateau();
+        
         scene2 = new  Scene(game);
         //on met en place la scene
         window.setScene(scene);
@@ -154,7 +154,6 @@ public class Main extends Application{
             play.setOnMouseClicked(e->{
             	buttonSound();
             	window.setScene(scene2);
-            	window.setFullScreen(true);
             });
             MenuButton options = new MenuButton("Options");
             options.setOnMouseClicked(e->{
