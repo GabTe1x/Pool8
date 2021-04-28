@@ -2,37 +2,53 @@ import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import javafx.animation.FadeTransition;
+import javafx.animation.AnimationTimer;
 import javafx.animation.TranslateTransition;
 
 public class Main extends Application{
 
-	
+	Stage window;
 	//menu principale
+	Scene scene,scene2;
 	private Menu menu;
 	//la musique de fond
 	private MediaPlayer mediaPlayer;
 	//son du jeu
 	private double volume;
 	private boolean b;//monter ou baisser le son
+	
+	
+	Stick stick;
+    ArrayList<Circle>billes;
+    ArrayList<String> keyPressed;
+    boolean coup;
 	
 	public static void main(String[] args) {
 		Greeter greeter = new Greeter();
@@ -43,11 +59,13 @@ public class Main extends Application{
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		
+		window = primaryStage;
 		//on initialise le son
 		volume=1.0;
+		coup=true;
 		
 		//on récupére la musique de fond et la joue en boucle jusqu'à la fin du programme
-		Media m =new Media(new File("src/main/ressources/msc.wav").toURI().toString());
+		Media m =new Media(new File("src/ressources/msc.wav").toURI().toString());
 		mediaPlayer=new MediaPlayer(m);
 		mediaPlayer.setOnEndOfMedia(new Runnable() {
 			public void run() {
@@ -57,38 +75,105 @@ public class Main extends Application{
 		
 		
 		//désactivation du changement de taille de la fenêtre
-		primaryStage.setResizable(false);
+		window.setResizable(false);
 		
 		//initalisationn du titre de la fenêtre
-		primaryStage.setTitle("PoolGame");
+		window.setTitle("PoolGame");
 		
 		//On récupère l'icone de la fenêtre puis on l'ajoute 
-        InputStream s = Files.newInputStream(Paths.get("src/main/ressources/icone.png"));
+        InputStream s = Files.newInputStream(Paths.get("src/ressources/icone.png"));
         Image icon=new Image(s);
         s.close();
-        primaryStage.getIcons().add(icon);
-
+        window.getIcons().add(icon);
+        
+        //On crée le plateau
+        Plateau pl = new Plateau();
+        
         //On crée la racine de la fenètre et on fixe une taille de préfèrence
         Pane root=new Pane();
-        root.setPrefSize(1080,624);
+        root.setPrefSize(pl.width,pl.height);
 
         //on récupère l'image de background et on ajuste la taille
-        InputStream is = Files.newInputStream(Paths.get("src/main/ressources/background.jpg"));
+        InputStream is = Files.newInputStream(Paths.get("src/ressources/background.jpg"));
         Image bg=new Image(is);
         is.close();
         ImageView bgView=new ImageView(bg);
-        bgView.setFitWidth(1080);
-        bgView.setFitHeight(624);
+        bgView.setFitWidth(pl.width);
+        bgView.setFitHeight(pl.height);
 
         //on initialise le menu
         menu = new Menu();
 
         //on ajoute le tout à la fenètre
         root.getChildren().addAll(bgView,menu);
+        scene = new Scene(root);
+        
+        BorderPane plateau =new BorderPane();
+        plateau.setBackground(new Background(new BackgroundFill(Color.DARKGREEN, CornerRadii.EMPTY, Insets.EMPTY)));
+        Canvas canvas = new Canvas(pl.width,pl.height);
+        GraphicsContext context = canvas.getGraphicsContext2D();
+        plateau.setCenter(canvas);
+        startGame(context);
+        pl.render(context);
+        scene2 = new  Scene(plateau);
+        
+        keyPressed = new ArrayList<>();
+
+        plateau.setOnKeyPressed(
+                (KeyEvent event)->
+                {
+                    String keyname = event.getCode().toString();
+                    if(!keyPressed.contains(keyname))keyPressed.add(keyname);
+                }
+        );
+
+        plateau.setOnKeyReleased(
+                (KeyEvent event)->
+                {
+                    String keyname = event.getCode().toString();
+                    if(keyPressed.contains(keyname))keyPressed.remove(keyname);
+                }
+        );
+        AnimationTimer gameloop = new AnimationTimer() {
+            @Override
+            public void handle(long l) {
+                pl.render(context);
+                //process user input
+                if(keyPressed.contains("LEFT"))stick.rotation-=1;
+                if(keyPressed.contains("RIGHT"))stick.rotation+=1;
+                if(keyPressed.contains("SPACE")){
+                    if(coup && Math.abs(stick.r-20)<200)stick.r+=2;
+                }
+                if(!keyPressed.contains("SPACE")){
+                    if(coup && stick.r-20>0)stick.r-=55;
+                    if(coup && stick.r-20<=0){
+                        stick.r=20;
+                    }
+                }
+
+
+
+                //process game objects
+                for (Circle circle:billes) {
+                    for (Circle c:billes) {
+                        if(circle.id!=c.id){
+                            if(circle.overlap(c)) {
+                                circle.collision(c);
+                                circle.repulsion(c);
+                            }
+                        }
+                    }
+                    circle.update(1/60.0);
+                    circle.render(context);
+                    stick.render(context);
+                }
+            }
+        };
+        
         //on met en place la scene
-        primaryStage.setScene(new Scene(root));
+        window.setScene(scene);
         //on montre la scene
-        primaryStage.show();
+        window.show();
         //on joue la musique
         mediaPlayer.play();
 	}
@@ -147,6 +232,7 @@ public class Main extends Application{
             MenuButton play = new MenuButton("Play");
             play.setOnMouseClicked(e->{
             	buttonSound();
+            	window.setScene(scene2);
             });
             MenuButton options = new MenuButton("Options");
             options.setOnMouseClicked(e->{
@@ -232,9 +318,31 @@ public class Main extends Application{
 	
 	//fonction pour jouer un son à chauqe clic sur un boutton
 	void buttonSound() {
-		Media m =new Media(new File("src/main/ressources/btn.wav").toURI().toString());
+		Media m =new Media(new File("src/ressources/btn.wav").toURI().toString());
 		MediaPlayer z=new MediaPlayer(m);
 		z.setVolume(volume);
 		z.play();
 	}
+	public void startGame(GraphicsContext context)throws Exception{
+        this.billes = new ArrayList<>();
+        this.stick = new Stick(300,413);
+        billes.add(new Circle(300 ,413,20,0));
+        billes.add(new Circle(1022,413,20,1));
+        billes.add(new Circle(1056,393,20,3));
+        billes.add(new Circle(1056,433,20,2));
+        billes.add(new Circle(1090,374,20,4));
+        billes.add(new Circle(1090,413,20,5));
+        billes.add(new Circle(1090,452,20,6));
+        billes.add(new Circle(1126,354,20,7));
+        billes.add(new Circle(1126,393,20,8));
+        billes.add(new Circle(1126,433,20,9));
+        billes.add(new Circle(1126,472,20,10));
+        billes.add(new Circle(1162,335,20,11));
+        billes.add(new Circle(1162,374,20,12));
+        billes.add(new Circle(1162,413,20,13));
+        billes.add(new Circle(1162,452,20,14));
+        billes.add(new Circle(1162,491,20,15));
+        for(Circle x:billes)x.render(context);
+        stick.render(context);
+    }
 }
