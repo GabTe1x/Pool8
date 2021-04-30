@@ -14,6 +14,7 @@ public class Circle {
     double radius;
     int id;
     Image image;
+    double mass=50;
 
     public Circle(double x,double y,double radius, int id) throws Exception {
         this.x=x;
@@ -53,54 +54,72 @@ public class Circle {
     boolean overlap(Circle circle){
 
         //check if two circles overlap
-        return Math.abs((this.x+ circle.x)*(this.x+ circle.x)+(this.y+ circle.y)*(this.y+ circle.y))
+        return Math.abs((this.x- circle.x)*(this.x- circle.x)+(this.y- circle.y)*(this.y- circle.y))
                 <= (this.radius+circle.radius)*(this.radius+circle.radius);
     }
 
     void collision(Circle circle){
 
         // check the distance
-        double dist = Math.sqrt((this.x- circle.x)*(this.y-circle.y));
+        double dist = Math.sqrt((this.x- circle.x)*(this.x- circle.x)+(this.y-circle.y)*(this.y- circle.y));
         double overlap= 0.5 * (dist - this.radius - circle.radius);
-        // update speed
-        setAcc(this.acc.x*0.8,this.acc.y*0.8);
 
         // update direction
-        this.x-= overlap * (this.x-circle.x)/dist;
-        this.y-=overlap * (this.y-circle.y)/dist;
+        this.x-= overlap * (this.x - circle.x)/dist;
+        this.y-=overlap * (this.y - circle.y)/dist;
         // update position
-        circle.x+= overlap * (this.x-circle.x)/dist;
-        circle.y+=overlap * (this.y-circle.y)/dist;
+        circle.x+= overlap * (this.x - circle.x)/dist;
+        circle.y+=overlap * (this.y - circle.y)/dist;
+    }
+
+    public boolean enMouvement(){
+        return !(this.dir.x == 0 && this.dir.y == 0);
+    }
+
+    public void collisionWall(){
+
     }
 
     public void repulsion(Circle circle){
-        double dist = Math.sqrt((this.x- circle.x)*(this.y-circle.y));
+        double dist = Math.sqrt((this.x- circle.x)*(this.x- circle.x)+(this.y-circle.y)*(this.y- circle.y));
 
+        //nomral
         Vector normal = new Vector((circle.x-this.x)/dist,(circle.y-this.y)/dist);
+
+        //tangente
         Vector tangent = new Vector( -normal.y, normal.x);
 
-        double prodtan=this.acc.x * tangent.x + this.acc.y*tangent.y;
-        double prodtan2=circle.acc.x * tangent.x + circle.acc.y*tangent.y;
+        //produit tangente
+        double prodtan=this.dir.x * tangent.x + this.dir.y * tangent.y;
+        double prodtan2=circle.dir.x * tangent.x + circle.dir.y * tangent.y;
 
-        double prodnorm=this.acc.x * normal.x + this.acc.y*normal.y;
-        double prodnorm2=circle.acc.x * normal.x + circle.acc.y*normal.y;
+        //produit normal
+        double prodnorm=this.dir.x * normal.x + this.dir.y * normal.y;
+        double prodnorm2=circle.dir.x * normal.x + circle.dir.y * normal.y;
 
-        this.setAcc((tangent.x * prodtan + normal.x * prodnorm2),(tangent.y * prodtan + normal.y * prodnorm2));
-        circle.setAcc((tangent.x * prodtan2 + normal.x * prodnorm),(tangent.y * prodtan2 + normal.y * prodnorm));
+        //conservation de la mass
+        double m1 = (2 * mass * prodnorm2) / (mass + mass);
+        double m2 =  (2 * mass * prodnorm) / (mass + mass);
+
+        //mise à jour des vitesses
+        this.setDir(tangent.x*prodtan+normal.x*m1,tangent.y*prodtan+normal.y*m1);
+        circle.setDir(tangent.x*prodtan2+normal.x*m1,tangent.y*prodtan2+normal.y*m1);
 
     }
 
     void update(double time){
         setAcc(-this.dir.x*0.8,-this.dir.y*0.8);
-        setDir(this.acc.x*time,this.acc.y*time);
-        this.x+= this.acc.x*time;
-        this.y+= this.acc.y*time;
-        if(Math.abs(this.acc.x*this.acc.x+this.acc.x*this.acc.x)<0.01)setAcc(0,0);
+        setDir(this.dir.x+this.acc.x*time,this.dir.y+this.acc.y*time);
+        this.x+= this.dir.x*time;
+        this.y+= this.dir.y*time;
+        if(Math.abs(this.dir.x*this.dir.x + this.dir.y*this.dir.y)<=0.05){
+            setDir(0,0);
+        }
     }
 
     void render(GraphicsContext context){
         context.save();
-        context.translate(x,y);
+        context.translate(this.x,this.y);
         context.translate(-this.image.getWidth()/2,-this.image.getHeight()/2);
         context.drawImage(this.image,0,0);
         context.restore();
