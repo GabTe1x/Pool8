@@ -5,6 +5,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
@@ -24,6 +25,9 @@ public class Main extends Application {
 
     //billes en mouvements
     ArrayList<Circle> enMouvement;
+
+    //billes en direct
+    ArrayList<Circle> aSupprimer;
 
     // boolean pour savoir si un coup est en cours et si la barre d'espace à déjà était appuyé ou pas
     boolean espace;
@@ -66,6 +70,7 @@ public class Main extends Application {
         //iniatialisation des deux array
         keyPressed = new ArrayList<>();
         enMouvement = new ArrayList<Circle>();
+        aSupprimer = new ArrayList<>();
 
         // on récupère les touches utilisées par le joueur
         plateau.setOnKeyPressed(
@@ -81,6 +86,13 @@ public class Main extends Application {
                 {
                     String keyname = event.getCode().toString();
                     if(keyPressed.contains(keyname))keyPressed.remove(keyname);
+                }
+        );
+
+        plateau.setOnMouseClicked(
+                (MouseEvent event)->
+                {
+                    System.out.println(event.getX()+""+event.getY());
                 }
         );
 
@@ -106,11 +118,11 @@ public class Main extends Application {
                     }
                     else if(posX<x2 && posY>y2 ) {
                         TriangleRectangle t = new TriangleRectangle(posX, posY, x2, y2, posX, y2);
-                        stick.rotation =360 - (int) t.getAngle();
+                        stick.rotation =360- (int) t.getAngle();
                     }
                     else if(posX>x2 && posY>y2 ) {
                         TriangleRectangle t = new TriangleRectangle(posX, posY, x2, y2, posX, y2);
-                        stick.rotation = 180 + (int) t.getAngle();
+                        stick.rotation = 180+(int) t.getAngle();
                     }
                 }
         );
@@ -119,51 +131,67 @@ public class Main extends Application {
             @Override
             public void handle(long l) {
                 pl.render(context);
-                //process user input
-                if(keyPressed.contains("SPACE")){
-                    if(coup && Math.abs(stick.r-20)<200){
-                        stick.r+=2;
-                        distance=stick.r;
-                    }
-                    espace = true;
-                }
-                if(!keyPressed.contains("SPACE")){
-                    if(coup && stick.r-20>0)stick.r-=55;
-                    if(coup && stick.r-20<=0){
-                        stick.r=20;
-                        if(espace) {
-                            billes.get(0).setDir((distance/5)*(billes.getFirst().x-posX),(distance/5)*(billes.getFirst().y-posY));
-                            espace = false;
-                            coup=false;
+                if(!billes.isEmpty()) {
+                    //process user input
+                    if (keyPressed.contains("SPACE")) {
+                        if (coup && Math.abs(stick.r - 20) < 200) {
+                            stick.r += 2;
+                            distance = stick.r;
                         }
+                        espace = true;
                     }
-                }
-
-                //process game objects
-                for (Circle circle:billes) {
-                    for (Circle c:billes) {
-                        if(circle.id!=c.id){
-                            if(circle.overlap(c)) {
-                                circle.collision(c);
-                                circle.repulsion(c);
+                    if (!keyPressed.contains("SPACE")) {
+                        if (coup && stick.r - 20 > 0) stick.r -= 55;
+                        if (coup && stick.r - 20 <= 0) {
+                            stick.r = 20;
+                            if (espace) {
+                                billes.get(0).setDir((distance / 5) * (billes.getFirst().x - posX), (distance / 5) * (billes.getFirst().y - posY));
+                                espace = false;
+                                coup = false;
                             }
                         }
                     }
-                    if(circle.enMouvement())enMouvement.add(circle);
-                    else enMouvement.remove(circle);
-                    if (circle.x-20 < 56) circle.x=1441-20;
-                    if (circle.y+20 >= 768)circle.y=56+20;
-                    if (circle.y-20 < 56)circle.y=768-20;
-                    if (circle.x+20 >= 1441)circle.x=56+20;
 
-                    circle.update(0.016);
-                    circle.render(context);
+                    //process game objects
+                    if (coup) stick.render(context);
+                    for (int i = 0; i < 4; i++) {
+                        for (Circle circle : billes) {
+                            for (Circle c : billes) {
+                                if (circle.id != c.id) {
+                                    if (circle.overlap(c)) {
+                                        circle.collision(c);
+                                        circle.repulsion(c);
+                                    }
+                                }
+                            }
+                            if (circle.enMouvement()) enMouvement.add(circle);
+                            else enMouvement.remove(circle);
+                            if (circle.testCollision()) aSupprimer.add(circle);
+                            if(!aSupprimer.contains(circle)) {
+                                circle.update(0.004);
+                                circle.render(context);
+                            }
+                        }
+                        if (enMouvement.isEmpty()) {
+                            coup = true;
+                            stick.setPos((int) billes.get(0).x, (int) billes.get(0).y);
+                        }
+                        //supression des billes qui sont tombé
+                        for (Circle circle:aSupprimer) {
+                            billes.remove(circle);
+                        }
+                        //si la bille blanche est tombé on la remet en jeu
+                        if(billes.getFirst().id!=0){
+                            try {
+                                billes.addFirst(new Circle(300 ,413,20,0));
+                            } catch (Exception e){
+                                e.printStackTrace();
+                            }
+                        }
+                        //on reset la list
+                        aSupprimer=new ArrayList<>();
+                    }
                 }
-                if(enMouvement.isEmpty()){
-                    coup=true;
-                    stick.setPos((int)billes.get(0).x,(int)billes.get(0).y);
-                }
-                if(coup)stick.render(context);
             }
         };
         gameloop.start();
