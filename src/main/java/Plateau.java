@@ -14,7 +14,6 @@ public class Plateau {
         image = chargerImage();
         width=image.getWidth();
         height=image.getHeight();
-
     }
     public Image chargerImage() throws Exception{
         try {

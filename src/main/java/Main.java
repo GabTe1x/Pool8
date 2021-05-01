@@ -1,124 +1,78 @@
-import java.io.File;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
+import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Parent;
+
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.effect.GaussianBlur;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.Background;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.util.Duration;
-import javafx.animation.AnimationTimer;
-import javafx.animation.TranslateTransition;
 
-public class Main extends Application{
+import java.util.ArrayList;
+import java.util.LinkedList;
 
-	Stage window;
-	//menu principale
-	Scene scene,scene2;
-	private Menu menu;
-	//la musique de fond
-	private MediaPlayer mediaPlayer;
-	//son du jeu
-	private double volume;
-	private boolean b;//monter ou baisser le son
-	
-	
-	Stick stick;
-    ArrayList<Circle>billes;
+public class Main extends Application {
+
+    // queue
+    Stick stick;
+
+    //billes actuellement dans le jeu
+    LinkedList<Circle>billes;
+
+    //touches sur lesquels on appuye
     ArrayList<String> keyPressed;
+
+    //billes en mouvements
+    ArrayList<Circle> enMouvement;
+
+    //billes en direct
+    ArrayList<Circle> aSupprimer;
+
+    // boolean pour savoir si un coup est en cours et si la barre d'espace à déjà était appuyé ou pas
+    boolean espace;
     boolean coup;
-	
-	public static void main(String[] args) {
-		Greeter greeter = new Greeter();
-		System.out.println(greeter.sayHello());
-    	launch(args);
-	}
 
-	@Override
-	public void start(Stage primaryStage) throws Exception {
-		
-		window = primaryStage;
-		//on initialise le son
-		volume=1.0;
-		coup=true;
-		
-		//on récupére la musique de fond et la joue en boucle jusqu'à la fin du programme
-		Media m =new Media(new File("src/ressources/msc.wav").toURI().toString());
-		mediaPlayer=new MediaPlayer(m);
-		mediaPlayer.setOnEndOfMedia(new Runnable() {
-			public void run() {
-				mediaPlayer.seek(Duration.ZERO);
-			}
-		});
-		
-		
-		//désactivation du changement de taille de la fenêtre
-		window.setResizable(false);
-		
-		//initalisationn du titre de la fenêtre
-		window.setTitle("PoolGame");
-		
-		//On récupère l'icone de la fenêtre puis on l'ajoute 
-        InputStream s = Files.newInputStream(Paths.get("src/ressources/icone.png"));
-        Image icon=new Image(s);
-        s.close();
-        window.getIcons().add(icon);
-        
-        //On crée le plateau
+    //position de la souris a moment du coup
+    double posX,posY;
+    //distance pointe de la queue-bille blanche
+    double distance;
+
+    @Override
+    public void start(Stage primaryStage) throws Exception{
+
+        //pas de changement de taille de la fenêtre
+        primaryStage.setResizable(false);
+        //on crée la racine du jeu
+        BorderPane root =new BorderPane();
+        //on met le titre
+        primaryStage.setTitle("Billard");
+        //on initialise les boooleans
+        coup=true;
+        espace=false;
+
+        //création du plateau
         Plateau pl = new Plateau();
-        
-        //On crée la racine de la fenètre et on fixe une taille de préfèrence
-        Pane root=new Pane();
-        root.setPrefSize(pl.width,pl.height);
+        //création de la convas avec les dimensions de l'image du plateau
+        Canvas bg = new Canvas(pl.width,pl.height);
+        //on récupère le context de la canvas
+        GraphicsContext context = bg.getGraphicsContext2D();
+        //on la met au centre de la racine
+        root.setCenter(bg);
 
-        //on récupère l'image de background et on ajuste la taille
-        InputStream is = Files.newInputStream(Paths.get("src/ressources/background.jpg"));
-        Image bg=new Image(is);
-        is.close();
-        ImageView bgView=new ImageView(bg);
-        bgView.setFitWidth(pl.width);
-        bgView.setFitHeight(pl.height);
-
-        //on initialise le menu
-        menu = new Menu();
-
-        //on ajoute le tout à la fenètre
-        root.getChildren().addAll(bgView,menu);
-        scene = new Scene(root);
-        
-        BorderPane plateau =new BorderPane();
-        plateau.setBackground(new Background(new BackgroundFill(Color.DARKGREEN, CornerRadii.EMPTY, Insets.EMPTY)));
-        Canvas canvas = new Canvas(pl.width,pl.height);
-        GraphicsContext context = canvas.getGraphicsContext2D();
-        plateau.setCenter(canvas);
-        startGame(context);
+        //on crée la scene avec la racine
+        Scene plateau = new Scene(root);
+        //on dessine le plateau
         pl.render(context);
-        scene2 = new  Scene(plateau);
-        
-        keyPressed = new ArrayList<>();
+        //on dessine les billes sur le plateau
+        startGame(context);
 
+        //iniatialisation des deux array
+        keyPressed = new ArrayList<>();
+        enMouvement = new ArrayList<Circle>();
+        aSupprimer = new ArrayList<>();
+
+        // on récupère les touches utilisées par le joueur
         plateau.setOnKeyPressed(
                 (KeyEvent event)->
                 {
@@ -126,7 +80,7 @@ public class Main extends Application{
                     if(!keyPressed.contains(keyname))keyPressed.add(keyname);
                 }
         );
-
+        // on enlève les touches qui ne sont plus utilisées par le joueur
         plateau.setOnKeyReleased(
                 (KeyEvent event)->
                 {
@@ -134,197 +88,122 @@ public class Main extends Application{
                     if(keyPressed.contains(keyname))keyPressed.remove(keyname);
                 }
         );
+
+        plateau.setOnMouseClicked(
+                (MouseEvent event)->
+                {
+                    System.out.println(event.getX()+""+event.getY());
+                }
+        );
+
+
+
+        //traitement des mouvements de la souris pour les coups
+        plateau.setOnMouseMoved(
+                mouseEvent -> {
+                    //on sauvegarde la position de la souris
+                    posX= mouseEvent.getX();
+                    posY= mouseEvent.getY();
+                    //positions de la bille blanche
+                    double x2=billes.get(0).x;
+                    double y2=billes.get(0).y;
+                    //traitement du dessins de la queue de billard
+                    if(posX<x2 && posY<y2 ) {
+                        TriangleRectangle t = new TriangleRectangle(posX, posY, x2, y2, posX, y2);
+                        stick.rotation = (int) t.getAngle();
+                    }
+                    else if(posX>x2 && posY<y2 ) {
+                        TriangleRectangle t = new TriangleRectangle(posX, posY, x2, y2, posX, y2);
+                        stick.rotation = 180 -(int) t.getAngle();
+                    }
+                    else if(posX<x2 && posY>y2 ) {
+                        TriangleRectangle t = new TriangleRectangle(posX, posY, x2, y2, posX, y2);
+                        stick.rotation =360- (int) t.getAngle();
+                    }
+                    else if(posX>x2 && posY>y2 ) {
+                        TriangleRectangle t = new TriangleRectangle(posX, posY, x2, y2, posX, y2);
+                        stick.rotation = 180+(int) t.getAngle();
+                    }
+                }
+        );
+
         AnimationTimer gameloop = new AnimationTimer() {
             @Override
             public void handle(long l) {
                 pl.render(context);
-                //process user input
-                if(keyPressed.contains("LEFT"))stick.rotation-=1;
-                if(keyPressed.contains("RIGHT"))stick.rotation+=1;
-                if(keyPressed.contains("SPACE")){
-                    if(coup && Math.abs(stick.r-20)<200)stick.r+=2;
-                }
-                if(!keyPressed.contains("SPACE")){
-                    if(coup && stick.r-20>0)stick.r-=55;
-                    if(coup && stick.r-20<=0){
-                        stick.r=20;
+                if(!billes.isEmpty()) {
+                    //process user input
+                    if (keyPressed.contains("SPACE")) {
+                        if (coup && Math.abs(stick.r - 20) < 200) {
+                            stick.r += 2;
+                            distance = stick.r;
+                        }
+                        espace = true;
                     }
-                }
-
-
-
-                //process game objects
-                for (Circle circle:billes) {
-                    for (Circle c:billes) {
-                        if(circle.id!=c.id){
-                            if(circle.overlap(c)) {
-                                circle.collision(c);
-                                circle.repulsion(c);
+                    if (!keyPressed.contains("SPACE")) {
+                        if (coup && stick.r - 20 > 0) stick.r -= 55;
+                        if (coup && stick.r - 20 <= 0) {
+                            stick.r = 20;
+                            if (espace) {
+                                billes.get(0).setDir((distance / 5) * (billes.getFirst().x - posX), (distance / 5) * (billes.getFirst().y - posY));
+                                espace = false;
+                                coup = false;
                             }
                         }
                     }
-                    circle.update(1/60.0);
-                    circle.render(context);
-                    stick.render(context);
+
+                    //process game objects
+                    if (coup) stick.render(context);
+                    for (int i = 0; i < 4; i++) {
+                        for (Circle circle : billes) {
+                            for (Circle c : billes) {
+                                if (circle.id != c.id) {
+                                    if (circle.overlap(c)) {
+                                        circle.collision(c);
+                                        circle.repulsion(c);
+                                    }
+                                }
+                            }
+                            if (circle.enMouvement()) enMouvement.add(circle);
+                            else enMouvement.remove(circle);
+                            if (circle.testCollision()) aSupprimer.add(circle);
+                            if(!aSupprimer.contains(circle)) {
+                                circle.update(0.004);
+                                circle.render(context);
+                            }
+                        }
+                        if (enMouvement.isEmpty()) {
+                            coup = true;
+                            stick.setPos((int) billes.get(0).x, (int) billes.get(0).y);
+                        }
+                        //supression des billes qui sont tombé
+                        for (Circle circle:aSupprimer) {
+                            billes.remove(circle);
+                        }
+                        //si la bille blanche est tombé on la remet en jeu
+                        if(billes.getFirst().id!=0){
+                            try {
+                                billes.addFirst(new Circle(300 ,413,20,0));
+                            } catch (Exception e){
+                                e.printStackTrace();
+                            }
+                        }
+                        //on reset la list
+                        aSupprimer=new ArrayList<>();
+                    }
                 }
             }
         };
-        
-        //on met en place la scene
-        window.setScene(scene);
-        //on montre la scene
-        window.show();
-        //on joue la musique
-        mediaPlayer.play();
-	}
-	
-	
-	// Code pour les bouttons
-	private class MenuButton extends StackPane{
-        private Text text;
+        gameloop.start();
+        primaryStage.setScene(plateau);
+        primaryStage.show();
+    }
 
-        public MenuButton(String name){
-            text=new Text(name);
-            text.setFont(text.getFont().font(25));
-            text.setFill(Color.BLACK);
 
-            //background du bouton
-            Rectangle bg= new Rectangle(250,30);
-            bg.setFill(Color.SKYBLUE);
-            bg.setOpacity(0.7);
-            bg.setEffect(new GaussianBlur(3.5));
+    public static void main(String[] args) { launch(args);}
 
-            setAlignment(Pos.CENTER_LEFT);
-            getChildren().addAll(bg,text);
-
-            //event lorsque la souris passe au-dessus
-            setOnMouseEntered(event ->{
-                text.setFill(Color.BLUE);
-                bg.setFill(Color.YELLOW);
-            });
-            
-            //retour à la normal quand elle sort
-            setOnMouseExited(event ->{
-                bg.setFill(Color.SKYBLUE);
-                text.setFill(Color.BLACK);
-            });
-        }
-    }	
-	
-	// création du menu et initialisation des sous menu
-	private class Menu extends Parent{
-		
-		public Menu(){
-			// on crée les 3 menu disponible
-            VBox menu = new VBox(10);
-            VBox menu_options=new VBox(10);
-
-            //on met leur position
-            menu.setTranslateX(400);
-            menu.setTranslateY(200);
-            
-            menu_options.setTranslateY(200);
-            // pour qu'il n'apparaisse pas dans l'écran on l'affiche hors de celui-ci
-            int offset = 800;
-            menu_options.setTranslateX(offset);
-            
-            //mettra en place la scene pour la partie
-            MenuButton play = new MenuButton("Play");
-            play.setOnMouseClicked(e->{
-            	buttonSound();
-            	window.setScene(scene2);
-            });
-            MenuButton options = new MenuButton("Options");
-            options.setOnMouseClicked(e->{
-            	getChildren().add(menu_options);
-            	buttonSound();
-            	//animation transition menu basique et menu options
-            	TranslateTransition f=new TranslateTransition(Duration.seconds(0.25),menu);
-            	TranslateTransition ff=new TranslateTransition(Duration.seconds(0.5),menu_options);
-            	
-            	// création de l'animation
-            	f.setToX(menu.getTranslateX()-offset);
-            	ff.setToX(menu.getTranslateX());
-            	//on joue l'animation
-            	f.play();
-            	ff.play();
-            	f.setOnFinished(evt->{
-            		getChildren().remove(menu);
-            	});
-            });
-            
-            MenuButton exit = new MenuButton("Exit");
-            //Quitte le jeu
-            exit.setOnMouseClicked(e->{
-            	buttonSound();
-            	System.exit(0);
-            });
-            MenuButton volumebtn = new MenuButton("Volume");
-            volumebtn.setOnMouseClicked(e->{
-            	buttonSound();
-            	if(volume>=1) {
-            		b=true;
-            		volume-=0.2;
-            	}else {
-            		if(volume>0 && b)volume-=0.2;
-            		else {
-            			if(volume<0.1) {
-            				volume+=0.2;
-            				b=false;
-            			}else volume+=0.2;
-            	}}
-            	System.out.println(volume);
-            });
-            
-            // bouton musique
-            MenuButton musique = new MenuButton("Musique");
-            musique.setOnMouseClicked(e->{
-            	buttonSound();
-            	//désactive ou active le son de la musique selon la valeur du volume
-            	if(mediaPlayer.getVolume()!=0)
-            		mediaPlayer.setVolume(0);
-            	else mediaPlayer.setVolume(volume);
-            		
-            });
-            
-            //bouton retour
-            MenuButton back = new MenuButton("Retour");
-            back.setOnMouseClicked(e->{
-            	getChildren().add(menu);
-            	buttonSound();
-            	//animation de transition entre le menu basique et le menu options
-            	TranslateTransition f=new TranslateTransition(Duration.seconds(0.25),menu_options);
-            	TranslateTransition ff=new TranslateTransition(Duration.seconds(0.5),menu);
-            	
-            	// on crée l'animation
-            	f.setToX(menu_options.getTranslateX()+offset);
-            	ff.setToX(menu_options.getTranslateX());
-            	
-            	//on joue l'animation
-            	f.play();
-            	ff.play();
-            	f.setOnFinished(evt->{
-            		getChildren().remove(menu_options);
-            	});            	
-            });
-            
-            // on ajoute les boutons aux menus correspondant
-            menu_options.getChildren().addAll(volumebtn,musique,back);
-            menu.getChildren().addAll(play,options,exit);
-            //puis on ajoute le menu de base au menu principale du jeu
-            getChildren().addAll(menu);
-		}
-	}
-	
-	//fonction pour jouer un son à chauqe clic sur un boutton
-	void buttonSound() {
-		Media m =new Media(new File("src/ressources/btn.wav").toURI().toString());
-		MediaPlayer z=new MediaPlayer(m);
-		z.setVolume(volume);
-		z.play();
-	}
-	public void startGame(GraphicsContext context)throws Exception{
-        this.billes = new ArrayList<>();
+    public void startGame(GraphicsContext context)throws Exception{
+        this.billes = new LinkedList<>();
         this.stick = new Stick(300,413);
         billes.add(new Circle(300 ,413,20,0));
         billes.add(new Circle(1022,413,20,1));
