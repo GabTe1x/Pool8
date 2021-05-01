@@ -24,10 +24,10 @@ public class Circle {
         this.radius=radius;
         this.id=id;
         if(id==0){
-            setImage("src/ressources/white.png");
+            setImage("src/resource/white.png");
             return;
         }
-        setImage("src/ressources/black.png");
+        setImage("src/resource/black.png");
     }
 
 
@@ -76,10 +76,6 @@ public class Circle {
         return !(this.dir.x == 0 && this.dir.y == 0);
     }
 
-    public void collisionWall(){
-
-    }
-
     public void repulsion(Circle circle){
         double dist = Math.sqrt((this.x- circle.x)*(this.x- circle.x)+(this.y-circle.y)*(this.y- circle.y));
 
@@ -107,12 +103,77 @@ public class Circle {
 
     }
 
+    void collisionWall(Circle circle){
+
+        // check the distance
+        double dist = Math.sqrt((this.x- circle.x)*(this.x- circle.x)+(this.y-circle.y)*(this.y- circle.y));
+        double overlap= 1 * (dist - this.radius - circle.radius);
+
+        // update direction
+        this.x-= overlap * (this.x - circle.x)/dist;
+        this.y-=overlap * (this.y - circle.y)/dist;
+    }
+
+    public void collisionWall(int z){
+        Circle c;
+        try {
+            if(z==56) {
+                if(z+20>=this.x)c=new Circle(z,this.y,1,0);
+                else c=new Circle(this.x,z,1,0);
+            }
+            else if(z==768)
+                c=new Circle(this.x,z,1,0);
+            else if(z==1441)
+                c=new Circle(z,this.y,1,0);
+            else
+                //impossible
+                c=new Circle(0,0,0,0);
+            c.setDir(-this.dir.x, -this.dir.y);
+            this.collisionWall(c);
+            this.repulsion(c);
+        }catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean testCollision(){
+        if(testVector())return true;
+        else {
+            if (this.x - 20 < 56) this.collisionWall(56);
+            if (this.y + 20 >= 768)   {
+                if (this.x>713 && this.x<785)return true;
+                else this.collisionWall(768);
+            }
+            if (this.y - 20 < 56) {
+                if (this.x > 713 && this.x < 785) return true;
+                else this.collisionWall(56);
+            }
+            if (this.x + 20 >= 1441) this.collisionWall(1441);
+        }
+        return false;
+    }
+
+    public boolean testVector(){
+        Vector v1 = new Vector(112-57,57-112);
+        Vector a1 = new Vector(112-this.x,57-this.y);
+        if(v1.x* a1.x - v1.y * a1.y >0)return true;
+        Vector v2 = new Vector(112-57,765-710);
+        Vector a2 = new Vector(112-this.x,765-this.y);
+        if(v2.x* a2.x - v2.y * a2.y >0)return true;
+        Vector v3 = new Vector(1386-1441,57-112);
+        Vector a3 = new Vector(1386-this.x,57-this.y);
+        if(v3.x* a3.x - v3.y * a3.y >0)return true;
+        Vector v4 = new Vector(1386-1441,765-710);
+        Vector a4 = new Vector(1386-this.x,765-this.y);
+        return v4.x * a4.x - v4.y * a4.y > 0;
+    }
+
     void update(double time){
-        setAcc(-this.dir.x*0.8,-this.dir.y*0.8);
+        setAcc(-this.dir.x*0.7,-this.dir.y*0.7);
         setDir(this.dir.x+this.acc.x*time,this.dir.y+this.acc.y*time);
         this.x+= this.dir.x*time;
         this.y+= this.dir.y*time;
-        if(Math.abs(this.dir.x*this.dir.x + this.dir.y*this.dir.y)<=0.05){
+        if(Math.abs(this.dir.x*this.dir.x + this.dir.y*this.dir.y)<=0.9){
             setDir(0,0);
         }
     }
