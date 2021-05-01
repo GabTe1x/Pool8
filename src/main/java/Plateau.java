@@ -17,7 +17,7 @@ public class Plateau {
     }
     public Image chargerImage() throws Exception{
         try {
-            InputStream s = Files.newInputStream(Paths.get("src/ressources/image.png"));
+            InputStream s = Files.newInputStream(Paths.get("src/ressource/image.png"));
             Image img = new Image(s);
             s.close();
             return img;

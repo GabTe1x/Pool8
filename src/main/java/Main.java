@@ -1,42 +1,56 @@
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 
+import javafx.geometry.HPos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Scanner;
 
 public class Main extends Application {
 
     // queue
-    Stick stick;
+    private Stick stick;
 
     //billes actuellement dans le jeu
-    LinkedList<Circle>billes;
+    private LinkedList<Circle>billes;
 
     //touches sur lesquels on appuye
-    ArrayList<String> keyPressed;
+    private ArrayList<String> keyPressed;
 
     //billes en mouvements
-    ArrayList<Circle> enMouvement;
+    private ArrayList<Circle> enMouvement;
 
     //billes en direct
-    ArrayList<Circle> aSupprimer;
+    private ArrayList<Circle> aSupprimer;
 
     // boolean pour savoir si un coup est en cours et si la barre d'espace à déjà était appuyé ou pas
-    boolean espace;
-    boolean coup;
+    private boolean espace;
+    private boolean coup;
 
     //position de la souris a moment du coup
-    double posX,posY;
+    private double posX,posY;
     //distance pointe de la queue-bille blanche
-    double distance;
+    private double distance;
+
+    private int billeTotal;
+    private int billeRestant;
+
+    private Status status_jeu;
+
+
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -78,6 +92,7 @@ public class Main extends Application {
                 {
                     String keyname = event.getCode().toString();
                     if(!keyPressed.contains(keyname))keyPressed.add(keyname);
+                    System.out.println(keyname);
                 }
         );
         // on enlève les touches qui ne sont plus utilisées par le joueur
@@ -128,6 +143,11 @@ public class Main extends Application {
         );
 
         AnimationTimer gameloop = new AnimationTimer() {
+            private double timer_game = 0.006;
+
+
+
+
             @Override
             public void handle(long l) {
                 pl.render(context);
@@ -152,6 +172,10 @@ public class Main extends Application {
                         }
                     }
 
+                    if(keyPressed.contains("ESCAPE")){
+                        timer_game = 0.006;
+                        System.out.println("j'ai cliké ça va xD ");
+                    }
                     //process game objects
                     if (coup) stick.render(context);
                     for (int i = 0; i < 4; i++) {
@@ -168,10 +192,10 @@ public class Main extends Application {
                             else enMouvement.remove(circle);
                             if (circle.testCollision()) aSupprimer.add(circle);
                             if(!aSupprimer.contains(circle)) {
-                                circle.update(0.004);
-                                circle.render(context);
+                                circle.update(timer_game);
                             }
                         }
+
                         if (enMouvement.isEmpty()) {
                             coup = true;
                             stick.setPos((int) billes.get(0).x, (int) billes.get(0).y);
@@ -191,14 +215,87 @@ public class Main extends Application {
                         //on reset la list
                         aSupprimer=new ArrayList<>();
                     }
+                    miseajour(billes); //resetSpeed
+                    miseajourBillesValeur();
+                    resetSpeed();
+                    }
+            }
+
+            public void resetSpeed(){
+                timer_game = 0.006;
+            }
+
+            public void miseajour(LinkedList<Circle> c ) {
+                for (Circle cercle : c) {
+                    cercle.render(context);
                 }
+            }
+
+            public void verificationVictoire(){
+                if(circleBlancPresent()){
+                    if(billes.size() == 1){
+                        for(Circle c: billes){
+                            if(c.id == 0){
+                                status_jeu = Status.VICTOIRE;
+                            }else{
+                                status_jeu = Status.DEFAITE;
+                            }
+                        }
+                    }
+                }else{
+                    status_jeu = Status.DEFAITE;
+                }
+            }
+
+            public boolean circleBlancPresent(){
+                for(Circle c: billes){
+                    if(c.id == 0){
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            public void demandeJouer(){
+                Scanner sc = new Scanner(System.in);
+                System.out.println("Voulez vous recommencer ? oui / non");
+                String reponse = sc.nextLine();
+                if(reponse.equals("oui") || reponse.equals("o")){
+                    try {
+                        startGame(context);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }else{
+                    System.exit(0);
+                }
+            }
+            public void miseajourBillesValeur(){
+                billeRestant = billes.size();
             }
         };
         gameloop.start();
         primaryStage.setScene(plateau);
         primaryStage.show();
+
     }
 
+    public enum Status{
+        MENU(""),
+        ENJEU("Bonne chance et bon jeu"),
+        VICTOIRE("Victoire, vous avez gagné !"),
+        DEFAITE("Defaite, vous avez perdu !"),
+        FINDEPARTIE("Fin de partie ressayez !");
+
+        private String s;
+        Status(String s){
+            this.s = s;
+        }
+        public String getStatut(){
+            return s;
+        }
+
+    }
 
     public static void main(String[] args) { launch(args);}
 
