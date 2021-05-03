@@ -29,6 +29,14 @@ import javafx.scene.text.Text;
 import java.awt.*;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -352,6 +360,8 @@ public class Main extends Application {
                         startGame(context);
                     } catch (Exception e) {
                         e.printStackTrace();
+                        verificationVictoire();
+
                     }
                     miseajour(billes); //resetSpeed
                     miseajourBillesValeur();
@@ -398,6 +408,10 @@ public class Main extends Application {
                     }
                 }
                 return false;
+            }
+
+            public void ajoutPoint(Joueur j, int points){
+                j.setScore(j.getScore() + points);
             }
 
             public void demandeJouer(){
