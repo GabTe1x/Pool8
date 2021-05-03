@@ -8,6 +8,7 @@ public class Plateau {
 
     Image image;
     double width,height;
+    Joueur j;
 
 
     public  Plateau() throws Exception {
@@ -32,5 +33,13 @@ public class Plateau {
         context.translate(0,0);
         context.drawImage(this.image,0,0);
         context.restore();
+    }
+
+    public void setJoueur(Joueur j){
+        this.j = j;
+    }
+
+    public Joueur getJoueur(){
+        return j;
     }
 }

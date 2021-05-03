@@ -13,7 +13,14 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -55,31 +62,31 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
 
-        //pas de changement de taille de la fenêtre
-        primaryStage.setResizable(false);
-        //on crée la racine du jeu
-        BorderPane root =new BorderPane();
-        //on met le titre
-        primaryStage.setTitle("Billard");
-        //on initialise les boooleans
+        /*Jeu Information */
+        this.status_jeu = Status.ENJEU;
         coup=true;
         espace=false;
-
-        //création du plateau
         Plateau pl = new Plateau();
-        //création de la convas avec les dimensions de l'image du plateau
+        Joueur joueur = new Joueur("Joueur 1");
+        pl.setJoueur(joueur);
+        /*Jeu Information */
+
+        //pas de changement de taille de la fenêtre
+        primaryStage.setResizable(false);
+        primaryStage.setTitle("Billard");
+
+        BorderPane root =new BorderPane();
         Canvas bg = new Canvas(pl.width,pl.height);
         //on récupère le context de la canvas
         GraphicsContext context = bg.getGraphicsContext2D();
         //on la met au centre de la racine
         root.setCenter(bg);
-
-        //on crée la scene avec la racine
         Scene plateau = new Scene(root);
-        //on dessine le plateau
         pl.render(context);
-        //on dessine les billes sur le plateau
         startGame(context);
+
+
+
 
         //iniatialisation des deux array
         keyPressed = new ArrayList<>();
@@ -142,15 +149,30 @@ public class Main extends Application {
                 }
         );
 
+
+
         AnimationTimer gameloop = new AnimationTimer() {
             private double timer_game = 0.006;
 
-
-
-
             @Override
             public void handle(long l) {
+                if(status_jeu == Status.VICTOIRE) {
+                    System.out.println(status_jeu.getStatut());
+                    drawText(status_jeu.getStatut(),600, 150, 30, context);
+                    //demandeJouer();
+                }else if(status_jeu == Status.DEFAITE){
+                    System.out.println(status_jeu.getStatut());
+                    drawText(status_jeu.getStatut(),600, 150, 30, context);
+                    // demandeJouer();
+                }
+
                 pl.render(context);
+                miseajour(billes);
+                drawText(status_jeu.getStatut(),600, 150, 30, context);
+                drawText("Pseudo: " + pl.j.getPseudo(), 1200, 150, 20, context);
+                drawText("Points: " + pl.j.getScore(), 1200, 200, 20, context);
+                drawText( ("Boules: " + billeRestant+"Boules /"+billeTotal + " Boules"), 1200, 250, 20, context);
+
                 if(!billes.isEmpty()) {
                     //process user input
                     if (keyPressed.contains("SPACE")) {
@@ -178,7 +200,9 @@ public class Main extends Application {
                     }
                     //process game objects
                     if (coup) stick.render(context);
+
                     for (int i = 0; i < 4; i++) {
+
                         for (Circle circle : billes) {
                             for (Circle c : billes) {
                                 if (circle.id != c.id) {
@@ -190,7 +214,9 @@ public class Main extends Application {
                             }
                             if (circle.enMouvement()) enMouvement.add(circle);
                             else enMouvement.remove(circle);
+
                             if (circle.testCollision()) aSupprimer.add(circle);
+
                             if(!aSupprimer.contains(circle)) {
                                 circle.update(timer_game);
                             }
@@ -202,8 +228,14 @@ public class Main extends Application {
                         }
                         //supression des billes qui sont tombé
                         for (Circle circle:aSupprimer) {
+                            if(circle.id == 0){
+                                status_jeu = Status.FINDEPARTIE;
+                            }else{
+                                ajoutPoint(pl.j, 150);
+                            }
                             billes.remove(circle);
                         }
+
                         //si la bille blanche est tombé on la remet en jeu
                         if(billes.getFirst().id!=0){
                             try {
@@ -214,6 +246,8 @@ public class Main extends Application {
                         }
                         //on reset la list
                         aSupprimer=new ArrayList<>();
+                        verificationVictoire();
+
                     }
                     miseajour(billes); //resetSpeed
                     miseajourBillesValeur();
@@ -254,6 +288,10 @@ public class Main extends Application {
                     }
                 }
                 return false;
+            }
+
+            public void ajoutPoint(Joueur j, int points){
+                j.setScore(j.getScore() + points);
             }
 
             public void demandeJouer(){
@@ -302,7 +340,7 @@ public class Main extends Application {
     public void startGame(GraphicsContext context)throws Exception{
         this.billes = new LinkedList<>();
         this.stick = new Stick(300,413);
-        billes.add(new Circle(300 ,413,20,0));
+        billes.add(new Circle(300 ,413,20,0)); //billes blanches
         billes.add(new Circle(1022,413,20,1));
         billes.add(new Circle(1056,393,20,3));
         billes.add(new Circle(1056,433,20,2));
@@ -320,5 +358,15 @@ public class Main extends Application {
         billes.add(new Circle(1162,491,20,15));
         for(Circle x:billes)x.render(context);
         stick.render(context);
+        //On retire -1 car on ne compte pas le boule blanchee
+        billeTotal = billes.size()-1;
+        billeRestant = billeTotal-1;
+    }
+
+    public void drawText(String s, int posX, int poxY, double size, GraphicsContext context){
+        context.setFont(new Font("Arial", size));
+        context.setFill(Color.WHITE);
+        context.setLineWidth(3.0);
+        context.fillText(s, posX, poxY);
     }
 }
