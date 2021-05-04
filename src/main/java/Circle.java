@@ -24,10 +24,15 @@ public class Circle {
         this.radius=radius;
         this.id=id;
         if(id==0){
-            setImage("src/ressource/white.png");
+            setImage("src/resource/white.png");
             return;
         }
-        setImage("src/ressource/black.png");
+        else if (id %2!=0){
+            setImage("src/ressource/black.png");
+        }
+        else{
+            setImage("src/ressources/red.png");
+        }
     }
 
 
