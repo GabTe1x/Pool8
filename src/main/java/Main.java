@@ -247,7 +247,8 @@ public class Main extends Application {
                 drawText("Pseudo: " + pl.joueur2.getPseudo(), 1200, 150, 20, context);
                 drawText("Points: " + pl.joueur2.getScore(), 1200, 200, 20, context);
                 drawText( ("Boules: " + billeRestant+"Boules /"+billeTotal + " Boules"), 1200, 250, 20, context);
-
+                drawText( "C'est à toi de Jouer " + pl.courant.getPseudo(), 600, 250, 25, context);
+                drawText( "C'est à toi de Jouer " + pl.courant.getPseudo(), 600, 250, 25, context);
                 if(!billes.isEmpty()) {
                     //process user input
                     if (keyPressed.contains("SPACE")) {
@@ -268,8 +269,6 @@ public class Main extends Application {
                             }
                         }
                     }
-
-
                     //process game objects
                     if (coup) stick.render(context);
                     for (int i = 0; i < 4; i++) {
@@ -293,16 +292,34 @@ public class Main extends Application {
                         if (enMouvement.isEmpty()) {
                             coup = true;
                             stick.setPos((int) billes.get(0).x, (int) billes.get(0).y);
+                            pl.changementJoueur();
                         }
+
                         //supression des billes qui sont tombé
                         for (Circle circle:aSupprimer) {
                             if(circle.id == 0){
                                 status_jeu = Status.FINDEPARTIE;
                             }else{
-                                ajoutPoint(pl.joueur1, 150);
+                                //Joueur 1 < - Noir
+                                //Joueur 2 < - Rouge
+                                if(pl.courant == pl.joueur1 ) {
+                                    if (circle.id % 2 == 0) {
+                                        retirerPoint(pl.courant, 200);
+                                    } else {
+                                        ajoutPoint(pl.courant, 150);
+                                    }
+
+                                }else{
+                                    if (circle.id % 2 != 0) {
+                                        retirerPoint(pl.courant, 200);
+                                    } else {
+                                        ajoutPoint(pl.courant, 150);
+                                    }
+                                }
                             }
                             billes.remove(circle);
                         }
+
                         //si la bille blanche est tombé on la remet en jeu
                         if(billes.getFirst().id!=0){
                             try {
@@ -338,6 +355,11 @@ public class Main extends Application {
                         for(Circle c: billes){
                             if(c.id == 0){
                                 status_jeu = Status.VICTOIRE;
+                                if(pl.joueur1.getScore() > pl.joueur2.getScore()){
+                                    drawText( "Joueur " + pl.joueur1.getPseudo() + " avec " + pl.joueur1.getScore() , 600, 300, 18, context);
+                                }else{
+                                    drawText( "Joueur " + pl.joueur2.getPseudo() + " avec " + pl.joueur2.getScore() , 600, 300, 18, context);
+                                }
                             }else{
                                 status_jeu = Status.DEFAITE;
                             }
