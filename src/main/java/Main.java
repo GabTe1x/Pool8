@@ -361,6 +361,14 @@ public class Main extends Application {
                 j.setScore(j.getScore() + points);
             }
 
+            public void retirerPoint(Joueur j, int points){
+                if (j.getScore()>=points){
+                    j.setScore(j.getScore() - points);
+                }else{
+                    j.setScore(0);
+                }
+
+            }
            /* public void demandeJouer(){
                 Scanner sc = new Scanner(System.in);
                 System.out.println("Voulez vous recommencer ? oui / non");
@@ -472,8 +480,8 @@ public class Main extends Application {
         this.stick = new Stick(300,413);
         billes.add(new Circle(300 ,413,20,0));
         billes.add(new Circle(1022,413,20,1));
-        billes.add(new Circle(1056,393,20,3));
-        billes.add(new Circle(1056,433,20,2));
+        billes.add(new Circle(1056,393,20,2));
+        billes.add(new Circle(1056,433,20,3));
         billes.add(new Circle(1090,374,20,4));
         billes.add(new Circle(1090,413,20,5));
         billes.add(new Circle(1090,452,20,6));
@@ -492,6 +500,7 @@ public class Main extends Application {
         //On retire -1 car on ne compte pas le boule blanchee
         billeTotal = billes.size()-1;
         billeRestant = billeTotal;
+
     }
 
     public void drawText(String s, int posX, int poxY, double size, GraphicsContext context){

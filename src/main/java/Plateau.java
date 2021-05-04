@@ -4,6 +4,7 @@ import javafx.scene.image.Image;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Random;
 public class Plateau {
 
     Image image;
@@ -24,11 +25,19 @@ public class Plateau {
 
     public void choisirJoueurAlea(){
         Random r = new Random();
-        int i=r.nextInt(1);
-        if (i == 0){
+        int i=r.nextInt(5)+1;
+        if (i < 3){
             courant = joueur1;
         }else {
             courant = joueur2;
+        }
+    }
+
+    public void changementJoueur(){
+        if(courant == joueur1){
+            courant = joueur2;
+        }else{
+            courant = joueur1;
         }
     }
 
