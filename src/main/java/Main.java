@@ -3,10 +3,12 @@ import javafx.application.Application;
 
 import javafx.geometry.HPos;
 import javafx.scene.Scene;
+import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -21,6 +23,10 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+
+import java.awt.*;
+import javafx.geometry.Insets;
+import javafx.scene.control.Button;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,6 +65,14 @@ public class Main extends Application {
 
 
 
+    //pour la partie pause du jeu
+    Scene quitScene;
+    Scene pauseScene;
+    Scene settingsScene;
+    Button resume;
+    Button quit;
+    Button settings;
+
     @Override
     public void start(Stage primaryStage) throws Exception{
 
@@ -73,7 +87,13 @@ public class Main extends Application {
 
         //pas de changement de taille de la fenêtre
         primaryStage.setResizable(false);
+        //on crée la racine du jeu
+        BorderPane root =new BorderPane();
+        //on met le titre
         primaryStage.setTitle("Billard");
+        //on initialise les boooleans
+        coup=true;
+        espace=false;
 
         BorderPane root =new BorderPane();
         Canvas bg = new Canvas(pl.width,pl.height);
@@ -81,25 +101,60 @@ public class Main extends Application {
         GraphicsContext context = bg.getGraphicsContext2D();
         //on la met au centre de la racine
         root.setCenter(bg);
+
+        //on crée la scene avec la racine
         Scene plateau = new Scene(root);
+        //on dessine le plateau
         pl.render(context);
+        //on dessine les billes sur le plateau
         startGame(context);
-
-
-
 
         //iniatialisation des deux array
         keyPressed = new ArrayList<>();
         enMouvement = new ArrayList<Circle>();
         aSupprimer = new ArrayList<>();
 
+
+
+        //les scenes pour la partie pause
+        Group panePauseScene = new Group();
+        resume = new Button("Reprendre la partie");
+        resume.setPadding(new Insets(10,10,10,10));
+        resume.prefHeight(30);
+        resume.setPrefWidth(250);
+        resume.setLayoutX(500);
+        resume.setLayoutY(200);
+        resume.setOnAction(e -> primaryStage.setScene(plateau));
+
+        quit = new Button("Quitter la partie");
+        quit.setPadding(new Insets(10,10,10,10));
+        quit.prefHeight(30);
+        quit.setPrefWidth(250);
+        quit.setLayoutX(500);
+        quit.setLayoutY(250);
+        quit.setOnAction(e -> primaryStage.close());
+
+        settings = new Button("Réglages");
+        settings.setPadding(new Insets(10,10,10,10));
+        settings.prefHeight(30);
+        settings.setPrefWidth(250);
+        settings.setLayoutX(500);
+        settings.setLayoutY(300);
+        settings.setOnAction(e -> primaryStage.setScene(settingsScene));
+
+        panePauseScene.getChildren().addAll(resume,settings,quit);
+        pauseScene = new Scene (panePauseScene, pl.width,pl.height);
+
         // on récupère les touches utilisées par le joueur
+        // le bouton 'esc' permet de mettre le jeu en pause
         plateau.setOnKeyPressed(
                 (KeyEvent event)->
                 {
+                    if (event.getCode()== KeyCode.ESCAPE){
+                        primaryStage.setScene(pauseScene);
+                    }
                     String keyname = event.getCode().toString();
                     if(!keyPressed.contains(keyname))keyPressed.add(keyname);
-                    System.out.println(keyname);
                 }
         );
         // on enlève les touches qui ne sont plus utilisées par le joueur
@@ -148,8 +203,6 @@ public class Main extends Application {
                     }
                 }
         );
-
-
 
         AnimationTimer gameloop = new AnimationTimer() {
             private double timer_game = 0.006;
@@ -200,9 +253,7 @@ public class Main extends Application {
                     }
                     //process game objects
                     if (coup) stick.render(context);
-
                     for (int i = 0; i < 4; i++) {
-
                         for (Circle circle : billes) {
                             for (Circle c : billes) {
                                 if (circle.id != c.id) {
@@ -214,14 +265,11 @@ public class Main extends Application {
                             }
                             if (circle.enMouvement()) enMouvement.add(circle);
                             else enMouvement.remove(circle);
-
                             if (circle.testCollision()) aSupprimer.add(circle);
-
                             if(!aSupprimer.contains(circle)) {
                                 circle.update(timer_game);
                             }
                         }
-
                         if (enMouvement.isEmpty()) {
                             coup = true;
                             stick.setPos((int) billes.get(0).x, (int) billes.get(0).y);
@@ -235,7 +283,6 @@ public class Main extends Application {
                             }
                             billes.remove(circle);
                         }
-
                         //si la bille blanche est tombé on la remet en jeu
                         if(billes.getFirst().id!=0){
                             try {
@@ -315,7 +362,6 @@ public class Main extends Application {
         gameloop.start();
         primaryStage.setScene(plateau);
         primaryStage.show();
-
     }
 
     public enum Status{
@@ -340,7 +386,7 @@ public class Main extends Application {
     public void startGame(GraphicsContext context)throws Exception{
         this.billes = new LinkedList<>();
         this.stick = new Stick(300,413);
-        billes.add(new Circle(300 ,413,20,0)); //billes blanches
+        billes.add(new Circle(300 ,413,20,0));
         billes.add(new Circle(1022,413,20,1));
         billes.add(new Circle(1056,393,20,3));
         billes.add(new Circle(1056,433,20,2));
