@@ -68,6 +68,7 @@ public class Main extends Application {
     //distance pointe de la queue-bille blanche
     private double distance;
 
+
     private int billeTotal;
     private int billeRestant;
 
@@ -91,8 +92,13 @@ public class Main extends Application {
         coup=true;
         espace=false;
         Plateau pl = new Plateau();
-        Joueur joueur = new Joueur("Joueur 1");
-        pl.setJoueur(joueur);
+        //On ajoute les 2 joueurs
+        Joueur joueur1 = new Joueur("Joueur 1");
+        Joueur joueur2 = new Joueur("Joueur 2");
+        pl.setJoueur1(joueur1);
+        pl.setJoueur2(joueur2);
+
+
         /*Jeu Information */
 
         //pas de changement de taille de la fenêtre
@@ -219,6 +225,7 @@ public class Main extends Application {
 
             @Override
             public void handle(long l) {
+                //Aficher le text (Victoire , Defaite , Fin Partie )
                 if(status_jeu == Status.VICTOIRE) {
                     System.out.println(status_jeu.getStatut());
                     drawText(status_jeu.getStatut(),600, 150, 30, context);
@@ -232,8 +239,11 @@ public class Main extends Application {
                 pl.render(context);
                 miseajour(billes);
                 drawText(status_jeu.getStatut(),600, 150, 30, context);
-                drawText("Pseudo: " + pl.j.getPseudo(), 1200, 150, 20, context);
-                drawText("Points: " + pl.j.getScore(), 1200, 200, 20, context);
+                drawText("Pseudo: " + pl.joueur1.getPseudo(), 150, 150, 20, context);
+                drawText("Points: " + pl.joueur1.getScore(), 150, 200, 20, context);
+                drawText( ("Boules: " + billeRestant+"Boules /"+billeTotal + " Boules"), 150, 250, 20, context);
+                drawText("Pseudo: " + pl.joueur2.getPseudo(), 1200, 150, 20, context);
+                drawText("Points: " + pl.joueur2.getScore(), 1200, 200, 20, context);
                 drawText( ("Boules: " + billeRestant+"Boules /"+billeTotal + " Boules"), 1200, 250, 20, context);
 
                 if(!billes.isEmpty()) {
@@ -257,10 +267,7 @@ public class Main extends Application {
                         }
                     }
 
-                    if(keyPressed.contains("ESCAPE")){
-                        timer_game = 0.006;
-                        System.out.println("j'ai cliké ça va xD ");
-                    }
+
                     //process game objects
                     if (coup) stick.render(context);
                     for (int i = 0; i < 4; i++) {
@@ -289,7 +296,7 @@ public class Main extends Application {
                             if(circle.id == 0){
                                 status_jeu = Status.FINDEPARTIE;
                             }else{
-                                ajoutPoint(pl.j, 150);
+                                ajoutPoint(pl.joueur1, 150);
                             }
                             billes.remove(circle);
                         }
@@ -351,7 +358,7 @@ public class Main extends Application {
                 j.setScore(j.getScore() + points);
             }
 
-            public void demandeJouer(){
+           /* public void demandeJouer(){
                 Scanner sc = new Scanner(System.in);
                 System.out.println("Voulez vous recommencer ? oui / non");
                 String reponse = sc.nextLine();
@@ -426,10 +433,10 @@ public class Main extends Application {
                     }
                 }else{
                     System.exit(0);
-                }
-            }
+                }*/
+
             public void miseajourBillesValeur(){
-                billeRestant = billes.size();
+                billeRestant = billes.size()-1;
             }
         };
         gameloop.start();
@@ -461,7 +468,7 @@ public class Main extends Application {
         this.stick = new Stick(300,413);
         billes.add(new Circle(300 ,413,20,0));
         billes.add(new Circle(1022,413,20,1));
-        billes.add(new Circle(1056,393,20,3));
+       /* billes.add(new Circle(1056,393,20,3));
         billes.add(new Circle(1056,433,20,2));
         billes.add(new Circle(1090,374,20,4));
         billes.add(new Circle(1090,413,20,5));
@@ -474,12 +481,12 @@ public class Main extends Application {
         billes.add(new Circle(1162,374,20,12));
         billes.add(new Circle(1162,413,20,13));
         billes.add(new Circle(1162,452,20,14));
-        billes.add(new Circle(1162,491,20,15));
+        billes.add(new Circle(1162,491,20,15));*/
         for(Circle x:billes)x.render(context);
         stick.render(context);
         //On retire -1 car on ne compte pas le boule blanchee
         billeTotal = billes.size()-1;
-        billeRestant = billeTotal-1;
+        billeRestant = billeTotal;
     }
 
     public void drawText(String s, int posX, int poxY, double size, GraphicsContext context){
