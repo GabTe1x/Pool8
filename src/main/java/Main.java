@@ -2,13 +2,18 @@ import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 
 import javafx.scene.Scene;
+import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
+import java.awt.*;
+import javafx.geometry.Insets;
+import javafx.scene.control.Button;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -37,6 +42,14 @@ public class Main extends Application {
     double posX,posY;
     //distance pointe de la queue-bille blanche
     double distance;
+
+    //pour la partie pause du jeu
+    Scene quitScene;
+    Scene pauseScene;
+    Scene settingsScene;
+    Button resume;
+    Button quit;
+    Button settings;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -72,10 +85,45 @@ public class Main extends Application {
         enMouvement = new ArrayList<Circle>();
         aSupprimer = new ArrayList<>();
 
+
+
+        //les scenes pour la partie pause
+        Group panePauseScene = new Group();
+        resume = new Button("Reprendre la partie");
+        resume.setPadding(new Insets(10,10,10,10));
+        resume.prefHeight(30);
+        resume.setPrefWidth(250);
+        resume.setLayoutX(500);
+        resume.setLayoutY(200);
+        resume.setOnAction(e -> primaryStage.setScene(plateau));
+
+        quit = new Button("Quitter la partie");
+        quit.setPadding(new Insets(10,10,10,10));
+        quit.prefHeight(30);
+        quit.setPrefWidth(250);
+        quit.setLayoutX(500);
+        quit.setLayoutY(250);
+        quit.setOnAction(e -> primaryStage.close());
+
+        settings = new Button("Réglages");
+        settings.setPadding(new Insets(10,10,10,10));
+        settings.prefHeight(30);
+        settings.setPrefWidth(250);
+        settings.setLayoutX(500);
+        settings.setLayoutY(300);
+        settings.setOnAction(e -> primaryStage.setScene(settingsScene));
+
+        panePauseScene.getChildren().addAll(resume,settings,quit);
+        pauseScene = new Scene (panePauseScene, pl.width,pl.height);
+
         // on récupère les touches utilisées par le joueur
+        // le bouton 'esc' permet de mettre le jeu en pause
         plateau.setOnKeyPressed(
                 (KeyEvent event)->
                 {
+                    if (event.getCode()== KeyCode.ESCAPE){
+                        primaryStage.setScene(pauseScene);
+                    }
                     String keyname = event.getCode().toString();
                     if(!keyPressed.contains(keyname))keyPressed.add(keyname);
                 }
