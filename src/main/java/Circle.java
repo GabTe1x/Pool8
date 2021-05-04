@@ -25,9 +25,13 @@ public class Circle {
         this.id=id;
         if(id==0){
             setImage("src/resource/white.png");
-            return;
         }
-        setImage("src/resource/black.png");
+        else if (id %2!=0){
+            setImage("src/resource/black.png");
+        }
+        else{
+            setImage("src/resource/red.png");
+        }
     }
 
 
