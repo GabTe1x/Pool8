@@ -248,7 +248,7 @@ public class Main extends Application {
                 drawText("Points: " + pl.joueur2.getScore(), 1200, 200, 20, context);
                 drawText( ("Boules: " + billeRestant+"Boules /"+billeTotal + " Boules"), 1200, 250, 20, context);
                 drawText( "C'est à toi de Jouer " + pl.courant.getPseudo(), 600, 250, 25, context);
-                drawText( "C'est à toi de Jouer " + pl.courant.getPseudo(), 600, 250, 25, context);
+
                 if(!billes.isEmpty()) {
                     //process user input
                     if (keyPressed.contains("SPACE")) {
