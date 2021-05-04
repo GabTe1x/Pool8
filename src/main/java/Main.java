@@ -91,13 +91,13 @@ public class Main extends Application {
         this.status_jeu = Status.ENJEU;
         coup=true;
         espace=false;
-        Plateau pl = new Plateau();
-        //On ajoute les 2 joueurs
+        // creation de 2 joueurs
+
         Joueur joueur1 = new Joueur("Joueur 1");
         Joueur joueur2 = new Joueur("Joueur 2");
-        pl.setJoueur1(joueur1);
-        pl.setJoueur2(joueur2);
 
+        //initialisation du Plateau
+        Plateau pl = new Plateau(joueur1,joueur2);
 
         /*Jeu Information */
 
@@ -111,7 +111,9 @@ public class Main extends Application {
         coup=true;
         espace=false;
 
-        BorderPane root =new BorderPane();
+        //création du plateau
+        Plateau pl = new Plateau();
+        //création de la convas avec les dimensions de l'image du plateau
         Canvas bg = new Canvas(pl.width,pl.height);
         //on récupère le context de la canvas
         GraphicsContext context = bg.getGraphicsContext2D();
@@ -287,6 +289,7 @@ public class Main extends Application {
                                 circle.update(timer_game);
                             }
                         }
+
                         if (enMouvement.isEmpty()) {
                             coup = true;
                             stick.setPos((int) billes.get(0).x, (int) billes.get(0).y);
@@ -442,6 +445,7 @@ public class Main extends Application {
         gameloop.start();
         primaryStage.setScene(plateau);
         primaryStage.show();
+
     }
 
     public enum Status{
@@ -468,7 +472,7 @@ public class Main extends Application {
         this.stick = new Stick(300,413);
         billes.add(new Circle(300 ,413,20,0));
         billes.add(new Circle(1022,413,20,1));
-       /* billes.add(new Circle(1056,393,20,3));
+        billes.add(new Circle(1056,393,20,3));
         billes.add(new Circle(1056,433,20,2));
         billes.add(new Circle(1090,374,20,4));
         billes.add(new Circle(1090,413,20,5));
@@ -481,7 +485,8 @@ public class Main extends Application {
         billes.add(new Circle(1162,374,20,12));
         billes.add(new Circle(1162,413,20,13));
         billes.add(new Circle(1162,452,20,14));
-        billes.add(new Circle(1162,491,20,15));*/
+        billes.add(new Circle(1162,491,20,15));
+
         for(Circle x:billes)x.render(context);
         stick.render(context);
         //On retire -1 car on ne compte pas le boule blanchee

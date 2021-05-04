@@ -10,13 +10,28 @@ public class Plateau {
     double width,height;
     Joueur joueur1;
     Joueur joueur2;
+    //joueur qui commence a jouer
+    Joueur courant;
 
-
-    public  Plateau() throws Exception {
+    public  Plateau(Joueur j1,Joueur j2) throws Exception {
         image = chargerImage();
         width=image.getWidth();
         height=image.getHeight();
+        joueur1=j1;
+        joueur2=j2;
+        choisirJoueurAlea();
     }
+
+    public void choisirJoueurAlea(){
+        Random r = new Random();
+        int i=r.nextInt(1);
+        if (i == 0){
+            courant = joueur1;
+        }else {
+            courant = joueur2;
+        }
+    }
+
     public Image chargerImage() throws Exception{
         try {
             InputStream s = Files.newInputStream(Paths.get("src/ressource/image.png"));
