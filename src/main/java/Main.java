@@ -130,8 +130,6 @@ public class Main extends Application {
         enMouvement = new ArrayList<Circle>();
         aSupprimer = new ArrayList<>();
 
-
-
         //les scenes pour la partie pause
         Group panePauseScene = new Group();
         resume = new Button("Reprendre la partie");
@@ -189,8 +187,6 @@ public class Main extends Application {
                 }
         );
 
-
-
         //traitement des mouvements de la souris pour les coups
         plateau.setOnMouseMoved(
                 mouseEvent -> {
@@ -227,13 +223,9 @@ public class Main extends Application {
             public void handle(long l) {
                 //Aficher le text (Victoire , Defaite , Fin Partie )
                 if(status_jeu == Status.VICTOIRE) {
-                    System.out.println(status_jeu.getStatut());
                     drawText(status_jeu.getStatut(),600, 150, 30, context);
-
                 }else if(status_jeu == Status.DEFAITE){
-                    System.out.println(status_jeu.getStatut());
                     drawText(status_jeu.getStatut(),600, 150, 30, context);
-
                 }
 
                 pl.render(context);
@@ -331,12 +323,20 @@ public class Main extends Application {
                 timer_game = 0.006;
             }
 
+            /**
+             *Cette fonction mets à jour les billes
+             *
+             * */
             public void miseajour(LinkedList<Circle> c ) {
                 for (Circle cercle : c) {
                     cercle.render(context);
                 }
             }
 
+            /**
+             *Cette fonction  change de statut du Jeu en fonction du nombre de billes restantes
+             *et compare le score de deux joueurs pour attribue un gagnant
+             * */
             public void verificationVictoire(){
                 if(circleBlancPresent()){
                     if(billes.size() == 1){
@@ -358,6 +358,10 @@ public class Main extends Application {
                 }
             }
 
+            /**
+            *Cette fonction renvoie la présence de la bille blanche sur le Plateau
+            * @return boolean
+            * */
             public boolean circleBlancPresent(){
                 for(Circle c: billes){
                     if(c.id == 0){
@@ -366,11 +370,20 @@ public class Main extends Application {
                 }
                 return false;
             }
-
+            /**
+             *Cette fonction ajoute de points au score du Joueur
+             * @param Joueur j <- c'est un objet Joueur
+             * @param int points
+             * */
             public void ajoutPoint(Joueur j, int points){
                 j.setScore(j.getScore() + points);
             }
 
+            /**
+             *Cette fonction retire de points au score du Joueur
+             * @param Joueur j <- c'est un objet Joueur
+             * @param int points
+             * */
             public void retirerPoint(Joueur j, int points){
                 if (j.getScore()>=points){
                     j.setScore(j.getScore() - points);
@@ -381,7 +394,10 @@ public class Main extends Application {
             }
 
 
-
+            /**
+             *Cette fonction renvoie le nombre de boules rouges au Plateau
+             * @return int  c'est le nombre de boules rouges au plateau
+             * */
             public int getBouleRougeRestant(){
                 int boule = 0;
                 for (Circle c :billes){
@@ -391,6 +407,11 @@ public class Main extends Application {
                 }
                 return boule;
             }
+
+            /**
+             *Cette fonction renvoie le nombre de boules noir au Plateau
+             * @return int  c'est le nombre de boules noir au plateau
+             * */
             public int getBouleNoirRestant(){
                 int boule = 0;
                 for (Circle c :billes){
@@ -401,6 +422,9 @@ public class Main extends Application {
                 return boule;
             }
 
+            /**
+             *Cette fonction mets à jour l'affichage du texte
+             * */
             public void misajourAffichage(){
                 drawText(status_jeu.getStatut(),600, 150, 30, context);
                 drawRectangle(context,230 , 30,630,160);
@@ -422,6 +446,15 @@ public class Main extends Application {
 
     }
 
+    /**
+     *Cette sous-classe enumeration donne un statut de jeu du Plateau
+     *en fonction de l'enumeration le statut de la partie change
+     *
+     * Par exemple : Si le jeu est en Victoire alors on verifie le statut et
+     * on annonce un gagnant
+     * Si c'est Menu c'est a dire que l'utilisateur est sur le Menu
+     * etc
+     * */
     public enum Status{
         MENU(""),
         ENJEU("Bonne chance et bon jeu"),
@@ -468,7 +501,14 @@ public class Main extends Application {
 
 
     }
-
+    /**
+     *Cette fonction affiche du texte
+     * @param String message a afficher
+     * @param int posX position x  sur le plateau
+     *  @param int posY position y  sur le plateau
+     * @param double size la taille d'ecriture
+     * @param context c'est le graphique de la canvas
+     * */
     public void drawText(String s, int posX, int poxY, double size, GraphicsContext context){
         context.setFont(new Font("Arial", size));
         context.setFill(Color.WHITE);
@@ -476,7 +516,15 @@ public class Main extends Application {
         context.fillText(s, posX, poxY);
     }
 
-    private void drawRectangle(GraphicsContext gc,int largeur , int hauteur , int x , int y ){
+    /**
+     *Cette fonction affiche du texte
+     * @param int posX position x  sur le plateau
+     *  @param int posY position y  sur le plateau
+     * @param int largeur taille  en largeur
+     * @param int hauteur taille  en hauteur
+     * @param context c'est le graphique de la canvas
+     * */
+    private void drawRectangle(GraphicsContext context,int largeur , int hauteur , int posX , int posY ){
         gc.setFill(new Color(0.1, 0.1, 0.1, 0.4));
         gc.fillRect(x,y, largeur , hauteur);
         gc.setStroke(Color.BLACK);
