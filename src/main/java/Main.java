@@ -84,6 +84,14 @@ public class Main extends Application {
     Button quit;
     Button settings;
 
+    //pour la partie pause du jeu
+    Scene quitScene;
+    Scene pauseScene;
+    Scene settingsScene;
+    Button resume;
+    Button quit;
+    Button settings;
+
     @Override
     public void start(Stage primaryStage) throws Exception{
 
@@ -129,6 +137,8 @@ public class Main extends Application {
         keyPressed = new ArrayList<>();
         enMouvement = new ArrayList<Circle>();
         aSupprimer = new ArrayList<>();
+
+
 
         //les scenes pour la partie pause
         Group panePauseScene = new Group();
