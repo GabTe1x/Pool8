@@ -228,11 +228,11 @@ public class Main extends Application {
                 if(status_jeu == Status.VICTOIRE) {
                     System.out.println(status_jeu.getStatut());
                     drawText(status_jeu.getStatut(),600, 150, 30, context);
-                    //demandeJouer();
+
                 }else if(status_jeu == Status.DEFAITE){
                     System.out.println(status_jeu.getStatut());
                     drawText(status_jeu.getStatut(),600, 150, 30, context);
-                    // demandeJouer();
+
                 }
 
                 pl.render(context);
@@ -294,9 +294,7 @@ public class Main extends Application {
 
                         //supression des billes qui sont tombé
                         for (Circle circle:aSupprimer) {
-                            if(circle.id == 0){
-                                status_jeu = Status.FINDEPARTIE;
-                            }else{
+                            if(circle.id != 0){
                                 //Joueur 1 < - Noir
                                 //Joueur 2 < - Rouge
                                 if(pl.courant == pl.joueur1 ) {
