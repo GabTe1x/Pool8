@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
+import javafx.scene.shape.Rectangle;
 
 public class Main extends Application {
 
@@ -237,14 +238,7 @@ public class Main extends Application {
 
                 pl.render(context);
                 miseajour(billes);
-                drawText(status_jeu.getStatut(),600, 150, 30, context);
-                drawText("Pseudo: " + pl.joueur1.getPseudo(), 150, 150, 20, context);
-                drawText("Points: " + pl.joueur1.getScore(), 150, 200, 20, context);
-                drawText( ("Boules: " + getBouleNoirRestant()+"Boules /"+billeTotal + " Boules"), 150, 250, 20, context);
-                drawText("Pseudo: " + pl.joueur2.getPseudo(), 1200, 150, 20, context);
-                drawText("Points: " + pl.joueur2.getScore(), 1200, 200, 20, context);
-                drawText( ("Boules: " + getBouleRougeRestant() +"Boules /"+billeTotal + " Boules"), 1200, 250, 20, context);
-                drawText( "C'est à toi de Jouer " + pl.courant.getPseudo(), 600, 250, 25, context);
+                misajourAffichage();
 
                 if(!billes.isEmpty()) {
                     //process user input
@@ -407,6 +401,20 @@ public class Main extends Application {
                 return boule;
             }
 
+            public void misajourAffichage(){
+                drawText(status_jeu.getStatut(),600, 150, 30, context);
+                drawRectangle(context,230 , 30,630,160);
+                drawRectangle(context,160 , 100,145,150);
+                drawRectangle(context,165 , 100,1195,150);
+                drawText("Pseudo: " + pl.joueur1.getPseudo(), 150, 180, 20, context);
+                drawText("Points: " + pl.joueur1.getScore(), 150, 200, 20, context);
+                drawText( ( getBouleNoirRestant()+" Boules noires "), 150, 220, 20, context);
+                drawText("Pseudo: " + pl.joueur2.getPseudo(), 1200, 180, 20, context);
+                drawText("Points: " + pl.joueur2.getScore(), 1200, 200, 20, context);
+                drawText( (getBouleRougeRestant() + " Boules rouges"), 1200, 220, 20, context);
+                drawText( "Au tour de : " + pl.courant.getPseudo(), 650, 180, 20, context);
+            }
+
         };
         gameloop.start();
         primaryStage.setScene(plateau);
@@ -467,4 +475,12 @@ public class Main extends Application {
         context.setLineWidth(3.0);
         context.fillText(s, posX, poxY);
     }
+
+    private void drawRectangle(GraphicsContext gc,int largeur , int hauteur , int x , int y ){
+        gc.setFill(new Color(0.1, 0.1, 0.1, 0.4));
+        gc.fillRect(x,y, largeur , hauteur);
+        gc.setStroke(Color.BLACK);
+
+    }
+
 }
