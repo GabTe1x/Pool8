@@ -24,16 +24,16 @@ public class Circle {
         this.radius=radius;
         this.id=id;
         if(id==0){
-            setImage("src/resource/white.png");
+            setImage("src/ressource/white.png");
         }
         else if (id == 15 ){
-            setImage("src/resource/black.png");
+            setImage("src/ressource/black.png");
         }
         else if (id %2!=0) {
-            setImage("src/resource/blue.png");
+            setImage("src/ressource/blue.png");
         }
         else{
-            setImage("src/resource/red.png");
+            setImage("src/ressource/red.png");
         }
     }
 
