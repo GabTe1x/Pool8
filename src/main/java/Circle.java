@@ -27,10 +27,10 @@ public class Circle {
             setImage("src/resource/white.png");
         }
         else if (id %2!=0){
-            setImage("src/resource/black.png");
+            setImage("src/ressource/black.png");
         }
         else{
-            setImage("src/resource/red.png");
+            setImage("src/ressources/red.png");
         }
     }
 

@@ -18,7 +18,7 @@ public class Stick {
         this.x=x;
         this.y=y;
         rotation=0;
-        setImage("src/ressources/stick.png");
+        setImage("src/ressource/stick.png");
     }
     public void setPos(int x,int y){
         this.x=x;

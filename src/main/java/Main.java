@@ -1,47 +1,88 @@
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 
+import javafx.geometry.HPos;
 import javafx.scene.Scene;
 import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 
 import java.awt.*;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Scanner;
+import javafx.scene.shape.Rectangle;
 
 public class Main extends Application {
 
     // queue
-    Stick stick;
+    private Stick stick;
 
     //billes actuellement dans le jeu
-    LinkedList<Circle>billes;
+    private LinkedList<Circle>billes;
 
     //touches sur lesquels on appuye
-    ArrayList<String> keyPressed;
+    private ArrayList<String> keyPressed;
 
     //billes en mouvements
-    ArrayList<Circle> enMouvement;
+    private ArrayList<Circle> enMouvement;
 
     //billes en direct
-    ArrayList<Circle> aSupprimer;
+    private ArrayList<Circle> aSupprimer;
 
     // boolean pour savoir si un coup est en cours et si la barre d'espace à déjà était appuyé ou pas
-    boolean espace;
-    boolean coup;
+    private boolean espace;
+    private boolean coup;
 
     //position de la souris a moment du coup
-    double posX,posY;
+    private double posX,posY;
     //distance pointe de la queue-bille blanche
-    double distance;
+    private double distance;
+
+
+    private int billeTotal;
+
+    private Status status_jeu;
+
+
+
+    //pour la partie pause du jeu
+    Scene quitScene;
+    Scene pauseScene;
+    Scene settingsScene;
+    Button resume;
+    Button quit;
+    Button settings;
 
     //pour la partie pause du jeu
     Scene quitScene;
@@ -54,6 +95,20 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
 
+        /*Jeu Information */
+        this.status_jeu = Status.ENJEU;
+        coup=true;
+        espace=false;
+        // creation de 2 joueurs
+
+        Joueur joueur1 = new Joueur("Joueur 1");
+        Joueur joueur2 = new Joueur("Joueur 2");
+
+        //initialisation du Plateau
+        Plateau pl = new Plateau(joueur1,joueur2);
+
+        /*Jeu Information */
+
         //pas de changement de taille de la fenêtre
         primaryStage.setResizable(false);
         //on crée la racine du jeu
@@ -64,8 +119,6 @@ public class Main extends Application {
         coup=true;
         espace=false;
 
-        //création du plateau
-        Plateau pl = new Plateau();
         //création de la convas avec les dimensions de l'image du plateau
         Canvas bg = new Canvas(pl.width,pl.height);
         //on récupère le context de la canvas
@@ -144,8 +197,6 @@ public class Main extends Application {
                 }
         );
 
-
-
         //traitement des mouvements de la souris pour les coups
         plateau.setOnMouseMoved(
                 mouseEvent -> {
@@ -176,9 +227,21 @@ public class Main extends Application {
         );
 
         AnimationTimer gameloop = new AnimationTimer() {
+            private double timer_game = 0.006;
+
             @Override
             public void handle(long l) {
+                //Aficher le text (Victoire , Defaite , Fin Partie )
+                if(status_jeu == Status.VICTOIRE) {
+                    drawText(status_jeu.getStatut(),600, 150, 30, context);
+                }else if(status_jeu == Status.DEFAITE){
+                    drawText(status_jeu.getStatut(),600, 150, 30, context);
+                }
+
                 pl.render(context);
+                miseajour(billes);
+                misajourAffichage();
+
                 if(!billes.isEmpty()) {
                     //process user input
                     if (keyPressed.contains("SPACE")) {
@@ -199,7 +262,6 @@ public class Main extends Application {
                             }
                         }
                     }
-
                     //process game objects
                     if (coup) stick.render(context);
                     for (int i = 0; i < 4; i++) {
@@ -216,18 +278,39 @@ public class Main extends Application {
                             else enMouvement.remove(circle);
                             if (circle.testCollision()) aSupprimer.add(circle);
                             if(!aSupprimer.contains(circle)) {
-                                circle.update(0.004);
-                                circle.render(context);
+                                circle.update(timer_game);
                             }
                         }
+
                         if (enMouvement.isEmpty()) {
                             coup = true;
                             stick.setPos((int) billes.get(0).x, (int) billes.get(0).y);
+                            pl.changementJoueur();
                         }
+
                         //supression des billes qui sont tombé
                         for (Circle circle:aSupprimer) {
+                            if(circle.id != 0){
+                                //Joueur 1 < - Noir
+                                //Joueur 2 < - Rouge
+                                if(pl.courant == pl.joueur1 ) {
+                                    if (circle.id % 2 == 0) {
+                                        retirerPoint(pl.courant, 200);
+                                    } else {
+                                        ajoutPoint(pl.courant, 150);
+                                    }
+
+                                }else{
+                                    if (circle.id % 2 != 0) {
+                                        retirerPoint(pl.courant, 200);
+                                    } else {
+                                        ajoutPoint(pl.courant, 150);
+                                    }
+                                }
+                            }
                             billes.remove(circle);
                         }
+
                         //si la bille blanche est tombé on la remet en jeu
                         if(billes.getFirst().id!=0){
                             try {
@@ -238,15 +321,166 @@ public class Main extends Application {
                         }
                         //on reset la list
                         aSupprimer=new ArrayList<>();
+                        verificationVictoire();
+
                     }
+                    miseajour(billes); //resetSpeed
+                    resetSpeed();
+                    }
+            }
+
+            public void resetSpeed(){
+                timer_game = 0.006;
+            }
+
+            /**
+             *Cette fonction mets à jour les billes
+             *
+             * */
+            public void miseajour(LinkedList<Circle> c ) {
+                for (Circle cercle : c) {
+                    cercle.render(context);
                 }
             }
+
+            /**
+             *Cette fonction  change de statut du Jeu en fonction du nombre de billes restantes
+             *et compare le score de deux joueurs pour attribue un gagnant
+             * */
+            public void verificationVictoire(){
+                if(circleBlancPresent()){
+                    if(billes.size() == 1){
+                        for(Circle c: billes){
+                            if(c.id == 0){
+                                status_jeu = Status.VICTOIRE;
+                                if(pl.joueur1.getScore() > pl.joueur2.getScore()){
+                                    drawText( "Joueur " + pl.joueur1.getPseudo() + " avec " + pl.joueur1.getScore() , 600, 300, 18, context);
+                                }else{
+                                    drawText( "Joueur " + pl.joueur2.getPseudo() + " avec " + pl.joueur2.getScore() , 600, 300, 18, context);
+                                }
+                            }else{
+                                status_jeu = Status.DEFAITE;
+                            }
+                        }
+                    }
+                }else{
+                    status_jeu = Status.DEFAITE;
+                }
+            }
+
+            /**
+            *Cette fonction renvoie la présence de la bille blanche sur le Plateau
+            * @return boolean
+            * */
+            public boolean circleBlancPresent(){
+                for(Circle c: billes){
+                    if(c.id == 0){
+                        return true;
+                    }
+                }
+                return false;
+            }
+            /**
+             *Cette fonction ajoute de points au score du Joueur
+             * @param Joueur j <- c'est un objet Joueur
+             * @param int points
+             * */
+            public void ajoutPoint(Joueur j, int points){
+                j.setScore(j.getScore() + points);
+            }
+
+            /**
+             *Cette fonction retire de points au score du Joueur
+             * @param Joueur j <- c'est un objet Joueur
+             * @param int points
+             * */
+            public void retirerPoint(Joueur j, int points){
+                if (j.getScore()>=points){
+                    j.setScore(j.getScore() - points);
+                }else{
+                    j.setScore(0);
+                }
+
+            }
+
+
+            /**
+             *Cette fonction renvoie le nombre de boules rouges au Plateau
+             * @return int  c'est le nombre de boules rouges au plateau
+             * */
+            public int getBouleRougeRestant(){
+                int boule = 0;
+                for (Circle c :billes){
+                    if ( c.id %2 == 0){
+                        boule++;
+                    }
+                }
+                return boule;
+            }
+
+            /**
+             *Cette fonction renvoie le nombre de boules noir au Plateau
+             * @return int  c'est le nombre de boules noir au plateau
+             * */
+            public int getBouleNoirRestant(){
+                int boule = 0;
+                for (Circle c :billes){
+                    if ( c.id %2 != 0){
+                        boule++;
+                    }
+                }
+                return boule;
+            }
+
+            /**
+             *Cette fonction mets à jour l'affichage du texte
+             * */
+            public void misajourAffichage(){
+                drawText(status_jeu.getStatut(),600, 150, 30, context);
+                drawRectangle(context,230 , 30,630,160);
+                drawRectangle(context,160 , 100,145,150);
+                drawRectangle(context,165 , 100,1195,150);
+                drawText("Pseudo: " + pl.joueur1.getPseudo(), 150, 180, 20, context);
+                drawText("Points: " + pl.joueur1.getScore(), 150, 200, 20, context);
+                drawText( ( getBouleNoirRestant()+" Boules noires "), 150, 220, 20, context);
+                drawText("Pseudo: " + pl.joueur2.getPseudo(), 1200, 180, 20, context);
+                drawText("Points: " + pl.joueur2.getScore(), 1200, 200, 20, context);
+                drawText( (getBouleRougeRestant() + " Boules rouges"), 1200, 220, 20, context);
+                drawText( "Au tour de : " + pl.courant.getPseudo(), 650, 180, 20, context);
+            }
+
         };
         gameloop.start();
         primaryStage.setScene(plateau);
         primaryStage.show();
+
     }
 
+    /**
+     *Cette sous-classe enumeration donne un statut de jeu du Plateau
+     *en fonction de l'enumeration le statut de la partie change
+     *
+     * Par exemple : Si le jeu est en Victoire alors on verifie le statut et
+     * on annonce un gagnant
+     * Si c'est Menu c'est a dire que l'utilisateur est sur le Menu
+     * etc
+     * */
+    public enum Status{
+        MENU(""),
+        ENJEU("Bonne chance et bon jeu"),
+        VICTOIRE("Victoire, vous avez gagné !"),
+        DEFAITE("Defaite, vous avez perdu !"),
+        FINDEPARTIE("Fin de partie ressayez !");
+
+        private String s;
+        Status(String s){
+            this.s = s;
+        }
+        public String getStatut(){
+            return s;
+        }
+
+    }
 
     public static void main(String[] args) { launch(args);}
 
@@ -255,8 +489,8 @@ public class Main extends Application {
         this.stick = new Stick(300,413);
         billes.add(new Circle(300 ,413,20,0));
         billes.add(new Circle(1022,413,20,1));
-        billes.add(new Circle(1056,393,20,3));
-        billes.add(new Circle(1056,433,20,2));
+        billes.add(new Circle(1056,393,20,2));
+        billes.add(new Circle(1056,433,20,3));
         billes.add(new Circle(1090,374,20,4));
         billes.add(new Circle(1090,413,20,5));
         billes.add(new Circle(1090,452,20,6));
@@ -269,7 +503,42 @@ public class Main extends Application {
         billes.add(new Circle(1162,413,20,13));
         billes.add(new Circle(1162,452,20,14));
         billes.add(new Circle(1162,491,20,15));
+
         for(Circle x:billes)x.render(context);
         stick.render(context);
+        //On retire -1 car on ne compte pas le boule blanchee
+        billeTotal = billes.size()-1;
+
+
     }
+    /**
+     *Cette fonction affiche du texte
+     * @param String message a afficher
+     * @param int posX position x  sur le plateau
+     *  @param int posY position y  sur le plateau
+     * @param double size la taille d'ecriture
+     * @param context c'est le graphique de la canvas
+     * */
+    public void drawText(String s, int posX, int poxY, double size, GraphicsContext context){
+        context.setFont(new Font("Arial", size));
+        context.setFill(Color.WHITE);
+        context.setLineWidth(3.0);
+        context.fillText(s, posX, poxY);
+    }
+
+    /**
+     *Cette fonction affiche du texte
+     * @param int posX position x  sur le plateau
+     *  @param int posY position y  sur le plateau
+     * @param int largeur taille  en largeur
+     * @param int hauteur taille  en hauteur
+     * @param context c'est le graphique de la canvas
+     * */
+    private void drawRectangle(GraphicsContext context,int largeur , int hauteur , int posX , int posY ){
+        context.setFill(new Color(0.1, 0.1, 0.1, 0.4));
+        context.fillRect(posX,posY, largeur , hauteur);
+        context.setStroke(Color.BLACK);
+
+    }
+
 }
