@@ -111,8 +111,6 @@ public class Main extends Application {
         coup=true;
         espace=false;
 
-        //création du plateau
-        Plateau pl = new Plateau();
         //création de la convas avec les dimensions de l'image du plateau
         Canvas bg = new Canvas(pl.width,pl.height);
         //on récupère le context de la canvas
@@ -391,82 +389,6 @@ public class Main extends Application {
                 }
 
             }
-           /* public void demandeJouer(){
-                Scanner sc = new Scanner(System.in);
-                System.out.println("Voulez vous recommencer ? oui / non");
-                String reponse = sc.nextLine();
-                if(reponse.equals("oui") || reponse.equals("o")){
-                    try {
-                        startGame(context);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        verificationVictoire();
-
-                    }
-                    miseajour(billes); //resetSpeed
-                    miseajourBillesValeur();
-                    resetSpeed();
-                    }
-                }else{
-                    System.exit(0);
-                }
-            }
-            public void miseajourBillesValeur(){
-                billeRestant = billes.size();
-            }
-
-            public void resetSpeed(){
-                timer_game = 0.006;
-            }
-
-            public void miseajour(LinkedList<Circle> c ) {
-                for (Circle cercle : c) {
-                    cercle.render(context);
-                }
-            }
-
-            public void verificationVictoire(){
-                if(circleBlancPresent()){
-                    if(billes.size() == 1){
-                        for(Circle c: billes){
-                            if(c.id == 0){
-                                status_jeu = Status.VICTOIRE;
-                            }else{
-                                status_jeu = Status.DEFAITE;
-                            }
-                        }
-                    }
-                }else{
-                    status_jeu = Status.DEFAITE;
-                }
-            }
-
-            public boolean circleBlancPresent(){
-                for(Circle c: billes){
-                    if(c.id == 0){
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-            public void ajoutPoint(Joueur j, int points){
-                j.setScore(j.getScore() + points);
-            }
-
-            public void demandeJouer(){
-                Scanner sc = new Scanner(System.in);
-                System.out.println("Voulez vous recommencer ? oui / non");
-                String reponse = sc.nextLine();
-                if(reponse.equals("oui") || reponse.equals("o")){
-                    try {
-                        startGame(context);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }else{
-                    System.exit(0);
-                }*/
 
             public void miseajourBillesValeur(){
                 billeRestant = billes.size()-1;
