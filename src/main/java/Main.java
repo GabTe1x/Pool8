@@ -525,9 +525,9 @@ public class Main extends Application {
      * @param context c'est le graphique de la canvas
      * */
     private void drawRectangle(GraphicsContext context,int largeur , int hauteur , int posX , int posY ){
-        gc.setFill(new Color(0.1, 0.1, 0.1, 0.4));
-        gc.fillRect(x,y, largeur , hauteur);
-        gc.setStroke(Color.BLACK);
+        context.setFill(new Color(0.1, 0.1, 0.1, 0.4));
+        context.fillRect(posX,posY, largeur , hauteur);
+        context.setStroke(Color.BLACK);
 
     }
 
