@@ -70,7 +70,6 @@ public class Main extends Application {
 
 
     private int billeTotal;
-    private int billeRestant;
 
     private Status status_jeu;
 
@@ -241,10 +240,10 @@ public class Main extends Application {
                 drawText(status_jeu.getStatut(),600, 150, 30, context);
                 drawText("Pseudo: " + pl.joueur1.getPseudo(), 150, 150, 20, context);
                 drawText("Points: " + pl.joueur1.getScore(), 150, 200, 20, context);
-                drawText( ("Boules: " + billeRestant+"Boules /"+billeTotal + " Boules"), 150, 250, 20, context);
+                drawText( ("Boules: " + getBouleNoirRestant()+"Boules /"+billeTotal + " Boules"), 150, 250, 20, context);
                 drawText("Pseudo: " + pl.joueur2.getPseudo(), 1200, 150, 20, context);
                 drawText("Points: " + pl.joueur2.getScore(), 1200, 200, 20, context);
-                drawText( ("Boules: " + billeRestant+"Boules /"+billeTotal + " Boules"), 1200, 250, 20, context);
+                drawText( ("Boules: " + getBouleRougeRestant() +"Boules /"+billeTotal + " Boules"), 1200, 250, 20, context);
                 drawText( "C'est à toi de Jouer " + pl.courant.getPseudo(), 600, 250, 25, context);
 
                 if(!billes.isEmpty()) {
@@ -332,7 +331,6 @@ public class Main extends Application {
 
                     }
                     miseajour(billes); //resetSpeed
-                    miseajourBillesValeur();
                     resetSpeed();
                     }
             }
@@ -390,9 +388,27 @@ public class Main extends Application {
 
             }
 
-            public void miseajourBillesValeur(){
-                billeRestant = billes.size()-1;
+
+
+            public int getBouleRougeRestant(){
+                int boule = 0;
+                for (Circle c :billes){
+                    if ( c.id %2 == 0){
+                        boule++;
+                    }
+                }
+                return boule;
             }
+            public int getBouleNoirRestant(){
+                int boule = 0;
+                for (Circle c :billes){
+                    if ( c.id %2 != 0){
+                        boule++;
+                    }
+                }
+                return boule;
+            }
+
         };
         gameloop.start();
         primaryStage.setScene(plateau);
@@ -443,7 +459,7 @@ public class Main extends Application {
         stick.render(context);
         //On retire -1 car on ne compte pas le boule blanchee
         billeTotal = billes.size()-1;
-        billeRestant = billeTotal;
+
 
     }
 
