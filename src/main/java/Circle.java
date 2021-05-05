@@ -26,11 +26,14 @@ public class Circle {
         if(id==0){
             setImage("src/resource/white.png");
         }
-        else if (id %2!=0){
-            setImage("src/ressource/black.png");
+        else if (id == 15 ){
+            setImage("src/resource/black.png");
+        }
+        else if (id %2!=0) {
+            setImage("src/resource/blue.png");
         }
         else{
-            setImage("src/ressources/red.png");
+            setImage("src/resource/red.png");
         }
     }
 
