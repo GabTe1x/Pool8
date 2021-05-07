@@ -26,7 +26,7 @@ public class Circle {
         if(id==0){
             setImage("src/ressource/white.png");
         }
-        else if (id == 15 ){
+        else if (id == 5 ){
             setImage("src/ressource/black.png");
         }
         else if (id %2!=0) {

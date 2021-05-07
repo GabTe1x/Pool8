@@ -70,8 +70,6 @@ public class Main extends Application {
     private double distance;
 
 
-    private int billeTotal;
-
     private Status status_jeu;
 
 
@@ -284,17 +282,16 @@ public class Main extends Application {
                         //supression des billes qui sont tombé
                         for (Circle circle:aSupprimer) {
                             if(circle.id != 0){
-                                //Joueur 1 < - Noir
+                                //Joueur 1 < - Bleu
                                 //Joueur 2 < - Rouge
                                 if(pl.courant == pl.joueur1 ) {
-                                    if (circle.id % 2 == 0) {
+                                    if (circle.id % 2 == 0 && circle.id != 0) {
                                         retirerPoint(pl.courant, 200);
                                     } else {
                                         ajoutPoint(pl.courant, 150);
                                     }
-
                                 }else{
-                                    if (circle.id % 2 != 0) {
+                                    if (circle.id % 2 != 0 && circle.id != 15) {
                                         retirerPoint(pl.courant, 200);
                                     } else {
                                         ajoutPoint(pl.courant, 150);
@@ -344,13 +341,15 @@ public class Main extends Application {
                 if(circleBlancPresent()){
                     if(billes.size() == 1){
                         for(Circle c: billes){
-                            if(c.id == 0){
+                            if(c.id == 0) {
                                 status_jeu = Status.VICTOIRE;
-                                if(pl.joueur1.getScore() > pl.joueur2.getScore()){
-                                    drawText( "Joueur " + pl.joueur1.getPseudo() + " avec " + pl.joueur1.getScore() , 600, 300, 18, context);
-                                }else{
-                                    drawText( "Joueur " + pl.joueur2.getPseudo() + " avec " + pl.joueur2.getScore() , 600, 300, 18, context);
+                                if (pl.joueur1.getScore() > pl.joueur2.getScore()) {
+                                    drawText("Joueur " + pl.joueur1.getPseudo() + " avec " + pl.joueur1.getScore(), 600, 300, 18, context);
+                                } else {
+                                    drawText("Joueur " + pl.joueur2.getPseudo() + " avec " + pl.joueur2.getScore(), 600, 300, 18, context);
                                 }
+                            }else if (c.id==15){
+                                status_jeu=Status.DEFAITE;
                             }else{
                                 status_jeu = Status.DEFAITE;
                             }
@@ -396,15 +395,17 @@ public class Main extends Application {
 
             }
 
-
             /**
              *Cette fonction renvoie le nombre de boules rouges au Plateau
+             * on cherche le nombre de boules avec leur id et la c'est des boules rouge
+             * donc avec leur id paire et on doit exclure l'id = 0 car
+             * c'est l'id de la boule blanche
              * @return int  c'est le nombre de boules rouges au plateau
              * */
             public int getBouleRougeRestant(){
                 int boule = 0;
                 for (Circle c :billes){
-                    if ( c.id %2 == 0){
+                    if ( c.id %2 == 0 && c.id !=0 ){
                         boule++;
                     }
                 }
@@ -412,13 +413,16 @@ public class Main extends Application {
             }
 
             /**
-             *Cette fonction renvoie le nombre de boules noir au Plateau
-             * @return int  c'est le nombre de boules noir au plateau
+             *Cette fonction renvoie le nombre de boules bleus au Plateau
+             * on cherche le nombre de boules avec leur id et la c'est des boules
+             * impaire et on doit exclure l'id = 15 car c'est l'id de la boule
+             * noir
+             * @return int  c'est le nombre de boules bleu au plateau
              * */
-            public int getBouleNoirRestant(){
+            public int getBouleBleuRestant(){
                 int boule = 0;
                 for (Circle c :billes){
-                    if ( c.id %2 != 0){
+                    if ( c.id %2 != 0 && c.id != 15 ){
                         boule++;
                     }
                 }
@@ -435,7 +439,7 @@ public class Main extends Application {
                 drawRectangle(context,165 , 100,1195,150);
                 drawText("Pseudo: " + pl.joueur1.getPseudo(), 150, 180, 20, context);
                 drawText("Points: " + pl.joueur1.getScore(), 150, 200, 20, context);
-                drawText( ( getBouleNoirRestant()+" Boules noires "), 150, 220, 20, context);
+                drawText( ( getBouleBleuRestant()+" Boules Bleus "), 150, 220, 20, context);
                 drawText("Pseudo: " + pl.joueur2.getPseudo(), 1200, 180, 20, context);
                 drawText("Points: " + pl.joueur2.getScore(), 1200, 200, 20, context);
                 drawText( (getBouleRougeRestant() + " Boules rouges"), 1200, 220, 20, context);
@@ -482,27 +486,23 @@ public class Main extends Application {
         this.stick = new Stick(300,413);
         billes.add(new Circle(300 ,413,20,0));
         billes.add(new Circle(1022,413,20,1));
-        billes.add(new Circle(1056,393,20,2));
-        billes.add(new Circle(1056,433,20,3));
+        billes.add(new Circle(1056,393,20,3));
+        billes.add(new Circle(1056,433,20,2));
         billes.add(new Circle(1090,374,20,4));
         billes.add(new Circle(1090,413,20,5));
-        billes.add(new Circle(1090,452,20,6));
-        billes.add(new Circle(1126,354,20,7));
-        billes.add(new Circle(1126,393,20,8));
-        billes.add(new Circle(1126,433,20,9));
-        billes.add(new Circle(1126,472,20,10));
-        billes.add(new Circle(1162,335,20,11));
-        billes.add(new Circle(1162,374,20,12));
-        billes.add(new Circle(1162,413,20,13));
+        billes.add(new Circle(1090,452,20,7));
+        billes.add(new Circle(1126,354,20,9));
+        billes.add(new Circle(1126,393,20,6));
+        billes.add(new Circle(1126,433,20,11));
+        billes.add(new Circle(1126,472,20,8));
+        billes.add(new Circle(1162,335,20,10));
+        billes.add(new Circle(1162,374,20,13));
+        billes.add(new Circle(1162,413,20,12));
         billes.add(new Circle(1162,452,20,14));
         billes.add(new Circle(1162,491,20,15));
 
         for(Circle x:billes)x.render(context);
         stick.render(context);
-        //On retire -1 car on ne compte pas le boule blanchee
-        billeTotal = billes.size()-1;
-
-
     }
     /**
      *Cette fonction affiche du texte
