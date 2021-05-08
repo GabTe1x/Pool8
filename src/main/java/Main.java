@@ -278,6 +278,7 @@ public class Main extends Application {
                             stick.setPos((int) billes.get(0).x, (int) billes.get(0).y);
                             pl.changementJoueur();
                         }
+                        System.out.println(enMouvement.size() + "test");
 
                         //supression des billes qui sont tombé
                         for (Circle circle:aSupprimer) {
@@ -300,11 +301,14 @@ public class Main extends Application {
                             }
                             billes.remove(circle);
                         }
-
+                        // context <- Graphic 2D Canvas
                         //si la bille blanche est tombé on la remet en jeu
                         if(billes.getFirst().id!=0){
                             try {
+                                enMouvement.clear();
                                 billes.addFirst(new Circle(300 ,413,20,0));
+                                stick.setPos((int) billes.get(0).x, (int) billes.get(0).y);
+                                stick.render(context);
                             } catch (Exception e){
                                 e.printStackTrace();
                             }
