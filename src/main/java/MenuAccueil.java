@@ -26,7 +26,7 @@ public class MenuAccueil {
 
     public Image chargerImage() throws Exception{
         try {
-            InputStream s = Files.newInputStream(Paths.get("src/resource/background.jpg"));
+            InputStream s = Files.newInputStream(Paths.get("src/ressource/background.jpg"));
             Image img = new Image(s);
             s.close();
             return img;
