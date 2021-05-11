@@ -42,6 +42,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+
+import javafx.animation.AnimationTimer;
+import javafx.application.Application;
+
 
 public class Main extends Application {
 
@@ -76,13 +83,30 @@ public class Main extends Application {
 
 
 
-    //pour la partie pause du jeu
-    Scene quitScene;
-    Scene pauseScene;
+// pour le menu d'acceuil du jeu
     Scene settingsScene;
-    Button resume;
-    Button quit;
-    Button settings;
+    Scene menu;
+    StyledButton play;
+    StyledButton settingsOptions;
+    StyledButton back;
+    StyledButton leave;
+
+
+    MediaPlayer backgroundMusic;
+    MediaPlayer clickSound;
+
+    private double volume;
+    private boolean b;//monter ou baisser le son
+
+    //pour la partie pause du jeu
+    Scene pauseScene;
+    Scene settingsScenePause;
+    StyledButton resume;
+    StyledButton music;
+    StyledButton quit;
+    StyledButton settings;
+    StyledButton backPause;
+
 
    
     @Override
@@ -133,34 +157,37 @@ public class Main extends Application {
 
 
 
-        //les scenes pour la partie pause
-        Group panePauseScene = new Group();
-        resume = new Button("Reprendre la partie");
-        resume.setPadding(new Insets(10,10,10,10));
-        resume.prefHeight(30);
-        resume.setPrefWidth(250);
-        resume.setLayoutX(500);
-        resume.setLayoutY(200);
-        resume.setOnAction(e -> primaryStage.setScene(plateau));
+        //la partie pause du jeu
+        MenuAccueil menuImagePause = new MenuAccueil();
+        Image imgPause = menuImagePause.chargerImage();
+        ImageView imgVPause = new ImageView(imgPause);
+        Group paneScenePause = new Group();
+        paneScenePause.getChildren().add(imgVPause);
+        resume = new StyledButton("Reprendre la partie",500,250);
+        resume.getText().setFont(resume.getText().getFont().font(25));
+        resume.setOnMouseClicked(e -> primaryStage.setScene(plateau));
 
-        quit = new Button("Quitter la partie");
-        quit.setPadding(new Insets(10,10,10,10));
-        quit.prefHeight(30);
-        quit.setPrefWidth(250);
-        quit.setLayoutX(500);
-        quit.setLayoutY(250);
-        quit.setOnAction(e -> primaryStage.close());
+        //option avec jeu en pause
 
-        settings = new Button("Réglages");
-        settings.setPadding(new Insets(10,10,10,10));
-        settings.prefHeight(30);
-        settings.setPrefWidth(250);
-        settings.setLayoutX(500);
-        settings.setLayoutY(300);
-        settings.setOnAction(e -> primaryStage.setScene(settingsScene));
+        MenuAccueil menuImageOptionPause = new MenuAccueil();
+        Image imgOptionPause = menuImageOptionPause.chargerImage();
+        ImageView imgVOptionPause = new ImageView(imgOptionPause);
+        Group paneOptionScenePause = new Group();
+        paneOptionScenePause.getChildren().add(imgVOptionPause);
+        settingsScenePause = new Scene (paneOptionScenePause, pl.width,pl.height);
+        settings = new StyledButton("Réglages",500,325);
+        settings.getText().setFont(settings.getText().getFont().font(25));
+        settings.setOnMouseClicked(e -> primaryStage.setScene(settingsScenePause));
+        music = new StyledButton("Musique",500,250);
+        backPause = new StyledButton("Retour",500,325);
+        backPause.setOnMouseClicked(e -> primaryStage.setScene(plateau));
+        paneOptionScenePause.getChildren().addAll(backPause,music);
+        quit = new StyledButton("Quitter la partie",500,400);
+        quit.getText().setFont(quit.getText().getFont().font(25));
+        quit.setOnMouseClicked(e -> primaryStage.close());
+        paneScenePause.getChildren().addAll(resume,settings,quit);
+        pauseScene = new Scene (paneScenePause, pl.width,pl.height);
 
-        panePauseScene.getChildren().addAll(resume,settings,quit);
-        pauseScene = new Scene (panePauseScene, pl.width,pl.height);
 
         // on récupère les touches utilisées par le joueur
         // le bouton 'esc' permet de mettre le jeu en pause
@@ -443,8 +470,59 @@ public class Main extends Application {
             }
 
         };
-        gameloop.start();
-        primaryStage.setScene(plateau);
+        //pour la partie accueil
+        Group paneMenuScene = new Group();
+        MenuAccueil menuImage = new MenuAccueil();
+        Image imgAccueil = menuImage.chargerImage();
+        ImageView imgVAcceuil = new ImageView(imgAccueil);
+        paneMenuScene.getChildren().add(imgVAcceuil);
+        play = new StyledButton("Jouer",500,250);
+        play.setOnMouseClicked(e->
+                {
+                    primaryStage.setScene(plateau);
+                    gameloop.start();
+                }
+                );
+        // pour la partie option dans le menu d'acceuil
+        settingsOptions = new StyledButton("Options", 500,325);
+        MenuAccueil menuImageOption = new MenuAccueil();
+        Image imgOption = menuImageOption.chargerImage();
+        ImageView imgVOption = new ImageView(imgOption);
+        Group paneOptionScene = new Group();
+        paneOptionScene.getChildren().add(imgVOption);
+        settingsScene = new Scene (paneOptionScene, pl.width,pl.height);
+        settingsOptions.setOnMouseClicked(e -> primaryStage.setScene(settingsScene));
+
+
+        menu= new Scene (paneMenuScene, pl.width,pl.height);
+        menu.setOnKeyPressed(
+                (KeyEvent event)->
+                {
+                    if (event.getCode() == KeyCode.ESCAPE) {
+                        primaryStage.close();
+                    }
+                }
+        );
+
+
+
+        back = new StyledButton("Retour",500,250);
+        back.setPadding(new Insets(10,10,10,10));
+        back.prefHeight(30);
+        back.setPrefWidth(250);
+        back.setLayoutX(500);
+        back.setLayoutY(500);
+        back.setOnMouseClicked(e -> primaryStage.setScene(menu));
+        paneOptionScene.getChildren().add(back);
+        //fin partie option
+
+        leave = new StyledButton("Quitter",500, 400);
+        leave.setOnMouseClicked(e -> primaryStage.close());
+        paneMenuScene.getChildren().addAll(play,settingsOptions,leave);
+
+        //fin partie acceuil
+
+        primaryStage.setScene(menu);
         primaryStage.show();
 
     }
@@ -461,7 +539,7 @@ public class Main extends Application {
     public enum Status{
         MENU(""),
         ENJEU("Bonne chance et bon jeu"),
-        VICTOIRE("Victoire, vous avez gagné !"),
+        VICTOIRE("Victoir, vous avez gagné !"),
         DEFAITE("Defaite, vous avez perdu !"),
         FINDEPARTIE("Fin de partie ressayez !");
 
