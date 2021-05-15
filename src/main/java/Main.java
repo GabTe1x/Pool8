@@ -245,7 +245,7 @@ public class Main extends Application {
         );
 
         AnimationTimer gameloop = new AnimationTimer() {
-            private double timer_game = 0.006;
+            private double timer_game = 0.5;
 
             @Override
             public void handle(long l) {
@@ -380,6 +380,7 @@ public class Main extends Application {
                                     drawText("Joueur " + pl.joueur2.getPseudo() + " avec " + pl.joueur2.getScore(), 600, 300, 18, context);
                                 }
                             }else if (c.id==15){
+                                drawText("Le Joueur  " + pl.courant.getPseudo() + " a perdu " , 600, 300, 18, context);
                                 status_jeu=Status.DEFAITE;
                             }else{
                                 status_jeu = Status.DEFAITE;
@@ -548,7 +549,7 @@ public class Main extends Application {
         MENU(""),
         ENJEU("Bonne chance et bon jeu"),
         VICTOIRE("Victoir, vous avez gagné !"),
-        DEFAITE("Defaite, vous avez perdu !"),
+        DEFAITE("Defaite, Fin de la Partie  !"),
         FINDEPARTIE("Fin de partie ressayez !");
 
         private String s;
