@@ -81,7 +81,9 @@ public class Main extends Application {
 
 
 
+
 // pour le menu d'acceuil du jeu
+    BorderPane root;
     Scene settingsScene;
     Scene menu;
     StyledButton play;
@@ -105,8 +107,8 @@ public class Main extends Application {
     StyledButton settings;
     StyledButton backPause;
 
+    private   Plateau pl;
 
-   
     @Override
     public void start(Stage primaryStage) throws Exception{
 
@@ -120,14 +122,14 @@ public class Main extends Application {
         Joueur joueur2 = new Joueur("Joueur 2");
 
         //initialisation du Plateau
-        Plateau pl = new Plateau(joueur1,joueur2);
+      pl= new Plateau(joueur1,joueur2);
 
         /*Jeu Information */
 
         //pas de changement de taille de la fenêtre
         primaryStage.setResizable(false);
         //on crée la racine du jeu
-        BorderPane root =new BorderPane();
+        root =new BorderPane();
         //on met le titre
         primaryStage.setTitle("Billard");
         //on initialise les boooleans
@@ -135,7 +137,7 @@ public class Main extends Application {
         espace=false;
 
         //création de la convas avec les dimensions de l'image du plateau
-        Canvas bg = new Canvas(pl.width,pl.height);
+        Canvas bg= new Canvas(pl.width,pl.height);
         //on récupère le context de la canvas
         GraphicsContext context = bg.getGraphicsContext2D();
         //on la met au centre de la racine
@@ -309,7 +311,7 @@ public class Main extends Application {
 
                         //supression des billes qui sont tombé
                         for (Circle circle:aSupprimer) {
-                            if(circle.id != 0){
+                            if(circle.id != 0 && circle.id !=5 ){
                                 //Joueur 1 < - Bleu
                                 //Joueur 2 < - Rouge
                                 if(pl.courant == pl.joueur1 ) {
@@ -325,6 +327,10 @@ public class Main extends Application {
                                         ajoutPoint(pl.courant, 150);
                                     }
                                 }
+                            }else if (circle.id == 5){
+                                status_jeu=Status.DEFAITE;
+                                drawText("Le Joueur  " + pl.courant.getPseudo() + " a perdu " , 600, 300, 18, context);
+                                restartButton(context);
                             }
                             billes.remove(circle);
                         }
@@ -370,20 +376,20 @@ public class Main extends Application {
              * */
             public void verificationVictoire(){
                 if(circleBlancPresent()){
-                    if(billes.size() == 1){
-                        for(Circle c: billes){
-                            if(c.id == 0) {
-                                status_jeu = Status.VICTOIRE;
-                                if (pl.joueur1.getScore() > pl.joueur2.getScore()) {
-                                    drawText("Joueur " + pl.joueur1.getPseudo() + " avec " + pl.joueur1.getScore(), 600, 300, 18, context);
+                    if (status_jeu == Status.ENJEU){
+                        if(billes.size() == 1) {
+                            for (Circle c : billes) {
+                                if (c.id == 0) {
+                                    status_jeu = Status.VICTOIRE;
+                                    if (pl.joueur1.getScore() > pl.joueur2.getScore()) {
+                                        drawText("Joueur " + pl.joueur1.getPseudo() + " avec " + pl.joueur1.getScore(), 600, 300, 18, context);
+                                    } else {
+                                        drawText("Joueur " + pl.joueur2.getPseudo() + " avec " + pl.joueur2.getScore(), 600, 300, 18, context);
+                                    }
                                 } else {
-                                    drawText("Joueur " + pl.joueur2.getPseudo() + " avec " + pl.joueur2.getScore(), 600, 300, 18, context);
+                                    status_jeu = Status.DEFAITE;
+                                    restartButton(context);
                                 }
-                            }else if (c.id==15){
-                                drawText("Le Joueur  " + pl.courant.getPseudo() + " a perdu " , 600, 300, 18, context);
-                                status_jeu=Status.DEFAITE;
-                            }else{
-                                status_jeu = Status.DEFAITE;
                             }
                         }
                     }
@@ -454,7 +460,7 @@ public class Main extends Application {
             public int getBouleBleuRestant(){
                 int boule = 0;
                 for (Circle c :billes){
-                    if ( c.id %2 != 0 && c.id != 15 ){
+                    if ( c.id %2 != 0 && c.id != 5 ){
                         boule++;
                     }
                 }
@@ -548,7 +554,7 @@ public class Main extends Application {
     public enum Status{
         MENU(""),
         ENJEU("Bonne chance et bon jeu"),
-        VICTOIRE("Victoir, vous avez gagné !"),
+        VICTOIRE("Victoire, vous avez gagné !"),
         DEFAITE("Defaite, Fin de la Partie  !"),
         FINDEPARTIE("Fin de partie ressayez !");
 
@@ -565,27 +571,7 @@ public class Main extends Application {
     public static void main(String[] args) { launch(args);}
 
     public void startGame(GraphicsContext context)throws Exception{
-        this.billes = new LinkedList<>();
-        this.stick = new Stick(300,413);
-        billes.add(new Circle(300 ,413,20,0));
-        billes.add(new Circle(1022,413,20,1));
-        billes.add(new Circle(1056,393,20,3));
-        billes.add(new Circle(1056,433,20,2));
-        billes.add(new Circle(1090,374,20,4));
-        billes.add(new Circle(1090,413,20,5));
-        billes.add(new Circle(1090,452,20,7));
-        billes.add(new Circle(1126,354,20,9));
-        billes.add(new Circle(1126,393,20,6));
-        billes.add(new Circle(1126,433,20,11));
-        billes.add(new Circle(1126,472,20,8));
-        billes.add(new Circle(1162,335,20,10));
-        billes.add(new Circle(1162,374,20,13));
-        billes.add(new Circle(1162,413,20,12));
-        billes.add(new Circle(1162,452,20,14));
-        billes.add(new Circle(1162,491,20,15));
-
-        for(Circle x:billes)x.render(context);
-        stick.render(context);
+        startandreseat(context);
     }
     /**
      *Cette fonction affiche du texte
@@ -601,7 +587,6 @@ public class Main extends Application {
         context.setLineWidth(3.0);
         context.fillText(s, posX, poxY);
     }
-
     /**
      *Cette fonction affiche du texte
      * @param int posX position x  sur le plateau
@@ -615,6 +600,53 @@ public class Main extends Application {
         context.fillRect(posX,posY, largeur , hauteur);
         context.setStroke(Color.BLACK);
 
+    }
+
+    private void restartButton(GraphicsContext context){
+        StyledButton recommmencer = new StyledButton("Recommencer", 700 ,400);
+        root.getChildren().addAll(recommmencer);
+        recommmencer.setOnMouseClicked(e->
+                {
+                    try {
+                        startandreseat(context);
+                        root.getChildren().removeAll(recommmencer);
+                        reseatPartie();
+                    }catch (Exception event){
+                        drawText("Une erreur est survenue", 500,500,25,context);
+                    }
+                }
+        );
+    }
+
+    private void startandreseat(GraphicsContext context)throws Exception{
+        this.billes = new LinkedList<>();
+        this.stick = new Stick(300,413);
+        billes.add(new Circle(300 ,413,20,0));
+        billes.add(new Circle(1022,413,20,1));
+        billes.add(new Circle(1056,393,20,3));
+        billes.add(new Circle(1056,433,20,2));
+        billes.add(new Circle(1090,374,20,4));
+        billes.add(new Circle(1090,413,20,5));
+        /*billes.add(new Circle(1090,452,20,7));
+        billes.add(new Circle(1126,354,20,9));
+        billes.add(new Circle(1126,393,20,6));
+        billes.add(new Circle(1126,433,20,11));
+        billes.add(new Circle(1126,472,20,8));
+        billes.add(new Circle(1162,335,20,10));
+        billes.add(new Circle(1162,374,20,13));
+        billes.add(new Circle(1162,413,20,12));
+        billes.add(new Circle(1162,452,20,14));
+        billes.add(new Circle(1162,491,20,15));
+        */
+        for(Circle x:billes)x.render(context);
+        stick.render(context);
+    }
+
+    private void reseatPartie(){
+        status_jeu = Status.ENJEU;
+        pl.joueur1.setScore(0);
+        pl.joueur2.setScore(0);
+        pl.choisirJoueurAlea();
     }
 
 }
