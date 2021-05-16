@@ -124,7 +124,7 @@ public class Main extends Application {
         Joueur joueur2 = new Joueur("Joueur 2");
 
         //initialisation du Plateau
-      	pl= new Plateau(joueur1,joueur2);
+      pl= new Plateau(joueur1,joueur2);
 
         /*Jeu Information */
 
@@ -139,7 +139,7 @@ public class Main extends Application {
         espace=false;
 
         //création de la convas avec les dimensions de l'image du plateau
-        Canvas bg= new Canvas(pl.getWidth(),pl.getHeight());
+        Canvas bg= new Canvas(pl.width,pl.height);
         //on récupère le context de la canvas
         GraphicsContext context = bg.getGraphicsContext2D();
         //on la met au centre de la racine
@@ -176,12 +176,19 @@ public class Main extends Application {
         ImageView imgVOptionPause = new ImageView(imgOptionPause);
         Group paneOptionScenePause = new Group();
         paneOptionScenePause.getChildren().add(imgVOptionPause);
-        settingsScenePause = new Scene (paneOptionScenePause, pl.getWidth(),pl.getHeight());
+        settingsScenePause = new Scene (paneOptionScenePause, pl.width,pl.height);
+       // settings = new StyledButton("Réglages",500,325);
+        //settings.getText().setFont(settings.getText().getFont().font(25));
+        //settings.setOnMouseClicked(e -> primaryStage.setScene(settingsScenePause));
+        //music = new StyledButton("Musique",500,250);
+        //backPause = new StyledButton("Retour",500,325);
+        //backPause.setOnMouseClicked(e -> primaryStage.setScene(plateau));
+        //paneOptionScenePause.getChildren().addAll(backPause,music);
         quit = new StyledButton("Quitter la partie",500,400);
         quit.getText().setFont(quit.getText().getFont().font(25));
         quit.setOnMouseClicked(e -> primaryStage.close());
         paneScenePause.getChildren().addAll(resume,quit);
-        pauseScene = new Scene (paneScenePause, pl.getWidth(),pl.getHeight());
+        pauseScene = new Scene (paneScenePause, pl.width,pl.height);
 
 
         // on récupère les touches utilisées par le joueur
@@ -205,6 +212,12 @@ public class Main extends Application {
                 }
         );
 
+        plateau.setOnMouseClicked(
+                (MouseEvent event)->
+                {
+                    System.out.println(event.getX()+""+event.getY());
+                }
+        );
 
         //traitement des mouvements de la souris pour les coups
         plateau.setOnMouseMoved(
@@ -213,24 +226,24 @@ public class Main extends Application {
                     posX= mouseEvent.getX();
                     posY= mouseEvent.getY();
                     //positions de la bille blanche
-                    double x2=billes.get(0).getX();
-                    double y2=billes.get(0).getY();
+                    double x2=billes.get(0).x;
+                    double y2=billes.get(0).y;
                     //traitement du dessins de la queue de billard
                     if(posX<x2 && posY<y2 ) {
                         TriangleRectangle t = new TriangleRectangle(posX, posY, x2, y2, posX, y2);
-                        stick.setRotation( (int) t.getAngle());
+                        stick.rotation = (int) t.getAngle();
                     }
                     else if(posX>x2 && posY<y2 ) {
                         TriangleRectangle t = new TriangleRectangle(posX, posY, x2, y2, posX, y2);
-                        stick.setRotation( 180 -(int) t.getAngle());
+                        stick.rotation = 180 -(int) t.getAngle();
                     }
                     else if(posX<x2 && posY>y2 ) {
                         TriangleRectangle t = new TriangleRectangle(posX, posY, x2, y2, posX, y2);
-                        stick.setRotation(360- (int) t.getAngle());
+                        stick.rotation =360- (int) t.getAngle();
                     }
                     else if(posX>x2 && posY>y2 ) {
                         TriangleRectangle t = new TriangleRectangle(posX, posY, x2, y2, posX, y2);
-                        stick.setRotation( 180+(int) t.getAngle());
+                        stick.rotation = 180+(int) t.getAngle();
                     }
                 }
         );
@@ -254,18 +267,18 @@ public class Main extends Application {
                 if(!billes.isEmpty()) {
                     //process user input
                     if (keyPressed.contains("SPACE")) {
-                        if (coup && Math.abs(stick.getR() - 20) < 200) {
-                            stick.setR(stick.getR()+ 2);
-                            distance = stick.getR();
+                        if (coup && Math.abs(stick.r - 20) < 200) {
+                            stick.r += 2;
+                            distance = stick.r;
                         }
                         espace = true;
                     }
                     if (!keyPressed.contains("SPACE")) {
-                        if (coup && stick.getR() - 20 > 0) stick.setR(stick.getR()-55);
-                        if (coup && stick.getR() - 20 <= 0) {
-                            stick.setR(20);
+                        if (coup && stick.r - 20 > 0) stick.r -= 55;
+                        if (coup && stick.r - 20 <= 0) {
+                            stick.r = 20;
                             if (espace) {
-                                billes.get(0).setDir((distance / 5) * (billes.getFirst().getX() - posX), (distance / 5) * (billes.getFirst().getY() - posY));
+                                billes.get(0).setDir((distance / 5) * (billes.getFirst().x - posX), (distance / 5) * (billes.getFirst().y - posY));
                                 espace = false;
                                 coup = false;
                             }
@@ -276,7 +289,7 @@ public class Main extends Application {
                     for (int i = 0; i < 4; i++) {
                         for (Circle circle : billes) {
                             for (Circle c : billes) {
-                                if (circle.getId() != c.getId()) {
+                                if (circle.id != c.id) {
                                     if (circle.overlap(c)) {
                                         circle.collision(c);
                                         circle.repulsion(c);
@@ -293,38 +306,38 @@ public class Main extends Application {
 
                         if (enMouvement.isEmpty()) {
                             coup = true;
-                            stick.setPos((int) billes.get(0).getX(), (int) billes.get(0).getY());
+                            stick.setPos((int) billes.get(0).x, (int) billes.get(0).y);
                             pl.changementJoueur();
                         }
 
                         //supression des billes qui sont tombé
                         for (Circle circle:aSupprimer) {
-                             if(circle.getId() != 0 && circle.getId() !=5 ){
+                             if(circle.id != 0 && circle.id !=5 ){
                                 //Joueur 1 < - Bleu
                                 //Joueur 2 < - Rouge
-                                if(pl.getCourant() == pl.getJoueur1() ) {
-                                    if (circle.getId() % 2 == 0 && circle.getId() != 0) {
-                                        retirerPoint(pl.getCourant(), 200);
+                                if(pl.courant == pl.joueur1 ) {
+                                    if (circle.id % 2 == 0 && circle.id != 0) {
+                                        retirerPoint(pl.courant, 200);
                                     } else {
-                                        ajoutPoint(pl.getCourant(), 150);
+                                        ajoutPoint(pl.courant, 150);
                                     }
                                 }else{
-                                    if (circle.getId() % 2 != 0 && circle.getId() != 15) {
-                                        retirerPoint(pl.getCourant(), 200);
+                                    if (circle.id % 2 != 0 && circle.id != 15) {
+                                        retirerPoint(pl.courant, 200);
                                     } else {
-                                        ajoutPoint(pl.getCourant(), 150);
+                                        ajoutPoint(pl.courant, 150);
                                     }
                                 }
-                            }else if (circle.getId() == 5){
+                            }else if (circle.id == 5){
                                  if (billes.size()>2) {
                                      status_jeu = Status.DEFAITE;
-                                     drawText("Le Joueur  " + pl.getCourant().getPseudo() + " a perdu ", 600, 300, 18, context);
+                                     drawText("Le Joueur  " + pl.courant.getPseudo() + " a perdu ", 600, 300, 18, context);
                                      restartButton(context);
                                  }else {
-                                     ajoutPoint(pl.getCourant(),300);
+                                     ajoutPoint(pl.courant,300);
                                      status_jeu= Status.VICTOIRE;
                                  }
-                            }else if (circle.getId() == 0){
+                            }else if (circle.id == 0){
                                 pl.changementJoueur();
 
                              }
@@ -333,11 +346,11 @@ public class Main extends Application {
                         }
                         // context <- Graphic 2D Canvas
                         //si la bille blanche est tombé on la remet en jeu
-                        if(billes.getFirst().getId()!=0){
+                        if(billes.getFirst().id!=0){
                             try {
                                 enMouvement.clear();
                                 billes.addFirst(new Circle(300 ,413,20,0));
-                                stick.setPos((int) billes.get(0).getX(), (int) billes.get(0).getY());
+                                stick.setPos((int) billes.get(0).x, (int) billes.get(0).y);
                                 stick.render(context);
                             } catch (Exception e){
                                 e.printStackTrace();
@@ -377,12 +390,12 @@ public class Main extends Application {
                     if (status_jeu == Status.ENJEU){
                         if(billes.size() == 1) {
                             for (Circle c : billes) {
-                                if (c.getId() == 0) {
+                                if (c.id == 0) {
                                     status_jeu = Status.VICTOIRE;
-                                    if (pl.getJoueur1().getScore() > pl.getJoueur2().getScore()) {
-                                        drawText("Joueur " + pl.getJoueur1().getPseudo() + " avec " + pl.getJoueur1().getScore(), 600, 300, 18, context);
+                                    if (pl.joueur1.getScore() > pl.joueur2.getScore()) {
+                                        drawText("Joueur " + pl.joueur1.getPseudo() + " avec " + pl.joueur1.getScore(), 600, 300, 18, context);
                                     } else {
-                                        drawText("Joueur " + pl.getJoueur2().getPseudo() + " avec " + pl.getJoueur2().getScore(), 600, 300, 18, context);
+                                        drawText("Joueur " + pl.joueur2.getPseudo() + " avec " + pl.joueur2.getScore(), 600, 300, 18, context);
                                     }
                                 } else {
                                     status_jeu = Status.DEFAITE;
@@ -402,7 +415,7 @@ public class Main extends Application {
             * */
             public boolean circleBlancPresent(){
                 for(Circle c: billes){
-                    if(c.getId() == 0){
+                    if(c.id == 0){
                         return true;
                     }
                 }
@@ -441,7 +454,7 @@ public class Main extends Application {
             public int getBouleRougeRestant(){
                 int boule = 0;
                 for (Circle c :billes){
-                    if ( c.getId() %2 == 0 && c.getId() !=0 ){
+                    if ( c.id %2 == 0 && c.id !=0 ){
                         boule++;
                     }
                 }
@@ -458,7 +471,7 @@ public class Main extends Application {
             public int getBouleBleuRestant(){
                 int boule = 0;
                 for (Circle c :billes){
-                    if ( c.getId() %2 != 0 && c.getId() != 5 ){
+                    if ( c.id %2 != 0 && c.id != 5 ){
                         boule++;
                     }
                 }
@@ -473,13 +486,13 @@ public class Main extends Application {
                 drawRectangle(context,230 , 30,630,160);
                 drawRectangle(context,160 , 100,145,150);
                 drawRectangle(context,165 , 100,1195,150);
-                drawText("Pseudo: " + pl.getJoueur1().getPseudo(), 150, 180, 20, context);
-                drawText("Points: " + pl.getJoueur1().getScore(), 150, 200, 20, context);
+                drawText("Pseudo: " + pl.joueur1.getPseudo(), 150, 180, 20, context);
+                drawText("Points: " + pl.joueur1.getScore(), 150, 200, 20, context);
                 drawText( ( getBouleBleuRestant()+" Boules Bleus "), 150, 220, 20, context);
-                drawText("Pseudo: " + pl.getJoueur2().getPseudo(), 1200, 180, 20, context);
-                drawText("Points: " + pl.getJoueur2().getScore(), 1200, 200, 20, context);
+                drawText("Pseudo: " + pl.joueur2.getPseudo(), 1200, 180, 20, context);
+                drawText("Points: " + pl.joueur2.getScore(), 1200, 200, 20, context);
                 drawText( (getBouleRougeRestant() + " Boules rouges"), 1200, 220, 20, context);
-                drawText( "Au tour de : " + pl.getCourant().getPseudo(), 650, 180, 20, context);
+                drawText( "Au tour de : " + pl.courant.getPseudo(), 650, 180, 20, context);
             }
 
         };
@@ -497,15 +510,17 @@ public class Main extends Application {
                 }
                 );
         // pour la partie option dans le menu d'acceuil
+        //settingsOptions = new StyledButton("Options", 500,325);
         MenuAccueil menuImageOption = new MenuAccueil();
         Image imgOption = menuImageOption.chargerImage();
         ImageView imgVOption = new ImageView(imgOption);
         Group paneOptionScene = new Group();
         paneOptionScene.getChildren().add(imgVOption);
-        settingsScene = new Scene (paneOptionScene, pl.getWidth(),pl.getHeight());
+        settingsScene = new Scene (paneOptionScene, pl.width,pl.height);
+        //settingsOptions.setOnMouseClicked(e -> primaryStage.setScene(settingsScene));
 
 
-        menu= new Scene (paneMenuScene, pl.getWidth(),pl.getHeight());
+        menu= new Scene (paneMenuScene, pl.width,pl.height);
         menu.setOnKeyPressed(
                 (KeyEvent event)->
                 {
@@ -514,6 +529,20 @@ public class Main extends Application {
                     }
                 }
         );
+
+
+
+       /* back = new StyledButton("Retour",500,250);
+        back.setPadding(new Insets(10,10,10,10));
+        back.prefHeight(30);
+        back.setPrefWidth(250);
+        back.setLayoutX(500);
+        back.setLayoutY(500);
+        back.setOnMouseClicked(e -> primaryStage.setScene(menu));
+        paneOptionScene.getChildren().add(back);
+        //fin partie option
+        */
+
 
         leave = new StyledButton("Quitter",500, 400);
         leave.setOnMouseClicked(e -> primaryStage.close());
@@ -646,10 +675,9 @@ public class Main extends Application {
      */
     private void reseatPartie(){
         status_jeu = Status.ENJEU;
-        pl.getJoueur1().setScore(0);
-        pl.getJoueur2().setScore(0);
+        pl.joueur1.setScore(0);
+        pl.joueur2.setScore(0);
         pl.choisirJoueurAlea();
     }
 
 }
-
