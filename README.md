@@ -18,6 +18,18 @@ gradle build
 ## Participation
 
 Gabriel : 
+- création du fichier gradle avec les dépendances.
+- Classes Circle , Stick, Vector.
+        -Collisions entre billes
+        -Collisions contre murs
+        -Chutes des billes (TestVectors())
+        -Fonction render et update avec chargement des images
+- Affichage du plateau avec gameloop et mise en place des billes.
+- Vérifications pour les ESPACES et MOUSE EVENT.
+- Vérifications des collisions dans la gameloop.
+- Création du style du premier menu.
+- Mise à jour du render de tout les éléments du jeu (billes+stick)
+- Classes triangle pour le calcul de l'angle (stick,souris)
 
 Leticia :
 
