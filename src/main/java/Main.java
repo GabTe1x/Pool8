@@ -205,12 +205,6 @@ public class Main extends Application {
                 }
         );
 
-        plateau.setOnMouseClicked(
-                (MouseEvent event)->
-                {
-                    System.out.println(event.getX()+""+event.getY());
-                }
-        );
 
         //traitement des mouvements de la souris pour les coups
         plateau.setOnMouseMoved(
