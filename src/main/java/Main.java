@@ -83,29 +83,29 @@ public class Main extends Application {
 
 
 // pour le menu d'acceuil du jeu
-    BorderPane root;
-    Scene settingsScene;
-    Scene menu;
-    StyledButton play;
-    StyledButton settingsOptions;
-    StyledButton back;
-    StyledButton leave;
+    private BorderPane root;
+    private Scene settingsScene;
+    private Scene menu;
+    private StyledButton play;
+    //StyledButton settingsOptions;
+    private StyledButton back;
+    private StyledButton leave;
 
 
-    MediaPlayer backgroundMusic;
-    MediaPlayer clickSound;
+    //MediaPlayer backgroundMusic;
+    //MediaPlayer clickSound;
 
     private double volume;
     private boolean b;//monter ou baisser le son
 
     //pour la partie pause du jeu
-    Scene pauseScene;
-    Scene settingsScenePause;
-    StyledButton resume;
-    StyledButton music;
-    StyledButton quit;
-    StyledButton settings;
-    StyledButton backPause;
+    private Scene pauseScene;
+    private Scene settingsScenePause;
+    private StyledButton resume;
+    //private StyledButton music;
+    private StyledButton quit;
+    //private StyledButton settings;
+    private StyledButton backPause;
 
     private   Plateau pl;
 
@@ -163,7 +163,7 @@ public class Main extends Application {
         ImageView imgVPause = new ImageView(imgPause);
         Group paneScenePause = new Group();
         paneScenePause.getChildren().add(imgVPause);
-        resume = new StyledButton("Reprendre la partie",500,250);
+        resume = new StyledButton("Reprendre la partie",500,300);
         resume.getText().setFont(resume.getText().getFont().font(25));
         resume.setOnMouseClicked(e -> primaryStage.setScene(plateau));
 
@@ -175,17 +175,17 @@ public class Main extends Application {
         Group paneOptionScenePause = new Group();
         paneOptionScenePause.getChildren().add(imgVOptionPause);
         settingsScenePause = new Scene (paneOptionScenePause, pl.width,pl.height);
-        settings = new StyledButton("Réglages",500,325);
-        settings.getText().setFont(settings.getText().getFont().font(25));
-        settings.setOnMouseClicked(e -> primaryStage.setScene(settingsScenePause));
-        music = new StyledButton("Musique",500,250);
-        backPause = new StyledButton("Retour",500,325);
-        backPause.setOnMouseClicked(e -> primaryStage.setScene(plateau));
-        paneOptionScenePause.getChildren().addAll(backPause,music);
+       // settings = new StyledButton("Réglages",500,325);
+        //settings.getText().setFont(settings.getText().getFont().font(25));
+        //settings.setOnMouseClicked(e -> primaryStage.setScene(settingsScenePause));
+        //music = new StyledButton("Musique",500,250);
+        //backPause = new StyledButton("Retour",500,325);
+        //backPause.setOnMouseClicked(e -> primaryStage.setScene(plateau));
+        //paneOptionScenePause.getChildren().addAll(backPause,music);
         quit = new StyledButton("Quitter la partie",500,400);
         quit.getText().setFont(quit.getText().getFont().font(25));
         quit.setOnMouseClicked(e -> primaryStage.close());
-        paneScenePause.getChildren().addAll(resume,settings,quit);
+        paneScenePause.getChildren().addAll(resume,quit);
         pauseScene = new Scene (paneScenePause, pl.width,pl.height);
 
 
@@ -495,7 +495,7 @@ public class Main extends Application {
         Image imgAccueil = menuImage.chargerImage();
         ImageView imgVAcceuil = new ImageView(imgAccueil);
         paneMenuScene.getChildren().add(imgVAcceuil);
-        play = new StyledButton("Jouer",500,250);
+        play = new StyledButton("Jouer",500,300);
         play.setOnMouseClicked(e->
                 {
                     primaryStage.setScene(plateau);
@@ -503,14 +503,14 @@ public class Main extends Application {
                 }
                 );
         // pour la partie option dans le menu d'acceuil
-        settingsOptions = new StyledButton("Options", 500,325);
+        //settingsOptions = new StyledButton("Options", 500,325);
         MenuAccueil menuImageOption = new MenuAccueil();
         Image imgOption = menuImageOption.chargerImage();
         ImageView imgVOption = new ImageView(imgOption);
         Group paneOptionScene = new Group();
         paneOptionScene.getChildren().add(imgVOption);
         settingsScene = new Scene (paneOptionScene, pl.width,pl.height);
-        settingsOptions.setOnMouseClicked(e -> primaryStage.setScene(settingsScene));
+        //settingsOptions.setOnMouseClicked(e -> primaryStage.setScene(settingsScene));
 
 
         menu= new Scene (paneMenuScene, pl.width,pl.height);
@@ -525,7 +525,7 @@ public class Main extends Application {
 
 
 
-        back = new StyledButton("Retour",500,250);
+       /* back = new StyledButton("Retour",500,250);
         back.setPadding(new Insets(10,10,10,10));
         back.prefHeight(30);
         back.setPrefWidth(250);
@@ -534,10 +534,12 @@ public class Main extends Application {
         back.setOnMouseClicked(e -> primaryStage.setScene(menu));
         paneOptionScene.getChildren().add(back);
         //fin partie option
+        */
+
 
         leave = new StyledButton("Quitter",500, 400);
         leave.setOnMouseClicked(e -> primaryStage.close());
-        paneMenuScene.getChildren().addAll(play,settingsOptions,leave);
+        paneMenuScene.getChildren().addAll(play,leave);
 
         //fin partie acceuil
 
