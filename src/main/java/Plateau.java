@@ -7,12 +7,12 @@ import java.nio.file.Paths;
 import java.util.Random;
 public class Plateau {
 
-    Image image;
-    double width,height;
-    Joueur joueur1;
-    Joueur joueur2;
+    private Image image;
+    private double width,height;
+    private Joueur joueur1;
+    private Joueur joueur2;
     //joueur qui commence a jouer
-    Joueur courant;
+    private Joueur courant;
 
     public  Plateau(Joueur j1,Joueur j2) throws Exception {
         image = chargerImage();
@@ -23,18 +23,55 @@ public class Plateau {
         choisirJoueurAlea();
     }
 
+    public Image getImage(){
+        return this.image;
+    }
+    public void setImage (Image im){
+        this.image = im;
+    }
+    public double getWidth(){
+        return this.width;
+    }
+    public void setWidth(double n){
+        this.width = n;
+    }
+    public double getHeight(){
+        return this.height;
+    }
+    public void setHeight(double m){
+        this.height = m;
+    }
+    public Joueur getJoueur1(){
+        return this.joueur1;
+    }
+    public void setJoueur1 (Joueur j1){
+        this.joueur1 = j1;
+    }
+    public Joueur getJoueur2(){
+        return this.joueur2;
+    }
+    public void setJoueur2(Joueur j2){
+        this.joueur2 = j2;
+    }
+    public Joueur getCourant(){
+        return this.courant;
+    }
+    public void setCourant(Joueur c){
+        this.courant = c;
+    }
+
     public void choisirJoueurAlea(){
         Random r = new Random();
         int i=r.nextInt(5)+1;
         if (i < 3){
-            courant = joueur1;
+            this.courant = this.joueur1;
         }else {
-            courant = joueur2;
+            this.courant = this.joueur2;
         }
     }
 
     public void changementJoueur(){
-        if(courant == joueur1){
+        if(getCourant() == getJoueur1()){
             courant = joueur2;
         }else{
             courant = joueur1;
@@ -56,22 +93,9 @@ public class Plateau {
     void render(GraphicsContext context){
         context.save();
         context.translate(0,0);
-        context.drawImage(this.image,0,0);
+        context.drawImage(this.getImage(),0,0);
         context.restore();
     }
 
-    public void setJoueur1(Joueur joueur1){
-        this.joueur1 = joueur1;
-    }
-    public void setJoueur2(Joueur joueur2){
-        this.joueur2 = joueur2;
-    }
 
-    public Joueur getJoueur1(){
-        return joueur1;
-    }
-
-    public Joueur getJoueur2() {
-        return joueur2;
-    }
 }

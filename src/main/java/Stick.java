@@ -7,11 +7,11 @@ import java.nio.file.Paths;
 
 public class Stick {
 
-    Image image;
-    int x;
-    int y;
-    int r=20;
-    int rotation;
+    private Image image;
+    private int x;
+    private int y;
+    private int r=20;
+    private int rotation;
 
 
     public Stick(int x,int y) throws Exception {
@@ -19,6 +19,36 @@ public class Stick {
         this.y=y;
         rotation=0;
         setImage("src/ressource/stick.png");
+    }
+    public Image getImage(){
+        return this.image;
+    }
+    public void setImage(Image im){
+        this.image = im;
+    }
+    public int getX(){
+        return this.x;
+    }
+    public void setX(int a){
+        this.x = a;
+    }
+    public int getY (){
+        return this.y;
+    }
+    public void setY(int b){
+        this.y = b ;
+    }
+    public int getR(){
+        return this.r;
+    }
+    public void setR(int r1){
+        this.r = r1;
+    }
+    public int getRotation(){
+        return this.rotation;
+    }
+    public void setRotation(int ro){
+        this.rotation = ro;
     }
     public void setPos(int x,int y){
         this.x=x;
@@ -28,10 +58,10 @@ public class Stick {
 
     public void render(GraphicsContext context){
         context.save();
-        context.translate(x,y);
-        context.rotate(this.rotation);
-        context.translate(-this.image.getWidth()-r,-this.image.getHeight()/2);
-        context.drawImage(this.image,0,0);
+        context.translate(getX(),getY());
+        context.rotate(this.getRotation());
+        context.translate(-this.getImage().getWidth()-getR(),-this.getImage().getHeight()/2);
+        context.drawImage(this.getImage(),0,0);
         context.restore();
     }
     public void setImage(String path)throws Exception{
