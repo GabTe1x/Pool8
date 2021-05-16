@@ -347,6 +347,7 @@ public class Main extends Application {
                             }
                         }
                         //on reset la list
+                        enMouvement.clear();
                         aSupprimer=new ArrayList<>();
                         verificationVictoire();
 
