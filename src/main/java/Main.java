@@ -307,11 +307,10 @@ public class Main extends Application {
                             stick.setPos((int) billes.get(0).x, (int) billes.get(0).y);
                             pl.changementJoueur();
                         }
-                        System.out.println(enMouvement.size() + "test");
 
                         //supression des billes qui sont tombé
                         for (Circle circle:aSupprimer) {
-                            if(circle.id != 0 && circle.id !=5 ){
+                             if(circle.id != 0 && circle.id !=5 ){
                                 //Joueur 1 < - Bleu
                                 //Joueur 2 < - Rouge
                                 if(pl.courant == pl.joueur1 ) {
@@ -331,10 +330,11 @@ public class Main extends Application {
                                 status_jeu=Status.DEFAITE;
                                 drawText("Le Joueur  " + pl.courant.getPseudo() + " a perdu " , 600, 300, 18, context);
                                 restartButton(context);
-                            }else if (circle.id ==0 ){
-                                status_jeu=Status.ENJEU;
+                            }else if (circle.id == 0){
                                 pl.changementJoueur();
-                            }
+
+                             }
+
                             billes.remove(circle);
                         }
                         // context <- Graphic 2D Canvas
@@ -644,7 +644,7 @@ public class Main extends Application {
         billes.add(new Circle(1056,433,20,2));
         billes.add(new Circle(1090,374,20,4));
         billes.add(new Circle(1090,413,20,5));
-        /*billes.add(new Circle(1090,452,20,7));
+        billes.add(new Circle(1090,452,20,7));
         billes.add(new Circle(1126,354,20,9));
         billes.add(new Circle(1126,393,20,6));
         billes.add(new Circle(1126,433,20,11));
@@ -654,7 +654,6 @@ public class Main extends Application {
         billes.add(new Circle(1162,413,20,12));
         billes.add(new Circle(1162,452,20,14));
         billes.add(new Circle(1162,491,20,15));
-        */
         for(Circle x:billes)x.render(context);
         stick.render(context);
     }
