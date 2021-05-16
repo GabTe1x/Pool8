@@ -2,8 +2,8 @@
 
 public class Vector {
 
-    private double x;
-    private double y;
+    double x;
+    double y;
 
     public Vector(){
         x=0;
@@ -14,22 +14,4 @@ public class Vector {
         this.x=x;
         this.y=y;
     }
-
-
-    double getX(){
-        return this.x;
-    }
-
-    void setX(double x1){
-        this.x = x1;
-    }
-
-    double getY(){
-        return this.y;
-    }
-
-    void setY(double y1){
-        this.y = y1;
-    }
-
 }
