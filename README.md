@@ -21,6 +21,6 @@ Gabriel :
 
 Leticia :
 
-Marylin :
+Marilyn : je me suis occupée de la partie Accueil et Pause du jeu. Tout ce qui est mise en page, action des boutons etc..., Gabriel avait commencé et j'ai continué. Ensuite fallait relier les "Scenes" d'accueil et de pause au reste du jeu. J'ai malheureusement pas réussi à mettre du son dans le jeu après maintes essaies (sûrement un bug sur ma machine). J'ai fait des recherches sur la physique aussi pour tout ce qui est collisions de boule. 
 
 Nabil :
