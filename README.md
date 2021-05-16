@@ -1,8 +1,11 @@
 # PoolGame
 
 Jeu développé en java avec la bibliothèque javafx pour ressembler au billard américain.
-Il y a deux joueurs avec 15 billes, au  début de la partie le joueur commence par frapper la 
-bille blanche et son but et de mettre les billes de l'autre joueur dans les trous chacun son tour.
+Il y a deux joueurs avec 15 billes,
+- Si la bille noir tombe en dernière dans un trou c'est une victoire pour l'un des joueurs sinon défaite pour le joueurs qui la fait tomber. 
+- s'il n'y a pas de billes de couleur sur le plateau le score des Joueurs et determine le gagnant. 
+- Si un Joueur met des billes de sa couleur dans l'un des trous, il gagne des 150 points sinon il perd 300points.
+- Chaque joueur joue chacun son tour.
 
 ## Installation
 
@@ -20,10 +23,10 @@ gradle build
 Gabriel : 
 - création du fichier gradle avec les dépendances.
 - Classes Circle , Stick, Vector.
-        -Collisions entre billes
-        -Collisions contre murs
-        -Chutes des billes (TestVectors())
-        -Fonction render et update avec chargement des images
+        - Collisions entre billes
+        - Collisions contre murs
+        - Chutes des billes (TestVectors())
+        - Fonction render et update avec chargement des images
 - Affichage du plateau avec gameloop et mise en place des billes.
 - Vérifications pour les ESPACES et MOUSE EVENT.
 - Vérifications des collisions dans la gameloop.
