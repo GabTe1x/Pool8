@@ -81,32 +81,36 @@ public class Main extends Application {
 
 
 
+
 // pour le menu d'acceuil du jeu
-    Scene settingsScene;
-    Scene menu;
-    StyledButton play;
-    StyledButton settingsOptions;
-    StyledButton back;
-    StyledButton leave;
+    private BorderPane root;
+    private Scene settingsScene;
+    private Scene menu;
+    private StyledButton play;
+    //StyledButton settingsOptions;
+    private StyledButton back;
+    private StyledButton leave;
 
 
-    MediaPlayer backgroundMusic;
-    MediaPlayer clickSound;
+    //MediaPlayer backgroundMusic;
+    //MediaPlayer clickSound;
 
     private double volume;
     private boolean b;//monter ou baisser le son
 
     //pour la partie pause du jeu
-    Scene pauseScene;
-    Scene settingsScenePause;
-    StyledButton resume;
-    StyledButton music;
-    StyledButton quit;
-    StyledButton settings;
-    StyledButton backPause;
+    private Scene pauseScene;
+    private Scene settingsScenePause;
+    private StyledButton resume;
+    //private StyledButton music;
+    private StyledButton quit;
+    //private StyledButton settings;
+    private StyledButton backPause;
 
+    private   Plateau pl;
 
-   
+    private AnimationTimer gameloop;
+
     @Override
     public void start(Stage primaryStage) throws Exception{
 
@@ -120,14 +124,14 @@ public class Main extends Application {
         Joueur joueur2 = new Joueur("Joueur 2");
 
         //initialisation du Plateau
-        Plateau pl = new Plateau(joueur1,joueur2);
+      pl= new Plateau(joueur1,joueur2);
 
         /*Jeu Information */
 
         //pas de changement de taille de la fenêtre
         primaryStage.setResizable(false);
         //on crée la racine du jeu
-        BorderPane root =new BorderPane();
+        root =new BorderPane();
         //on met le titre
         primaryStage.setTitle("Billard");
         //on initialise les boooleans
@@ -135,7 +139,7 @@ public class Main extends Application {
         espace=false;
 
         //création de la convas avec les dimensions de l'image du plateau
-        Canvas bg = new Canvas(pl.width,pl.height);
+        Canvas bg= new Canvas(pl.width,pl.height);
         //on récupère le context de la canvas
         GraphicsContext context = bg.getGraphicsContext2D();
         //on la met au centre de la racine
@@ -161,7 +165,7 @@ public class Main extends Application {
         ImageView imgVPause = new ImageView(imgPause);
         Group paneScenePause = new Group();
         paneScenePause.getChildren().add(imgVPause);
-        resume = new StyledButton("Reprendre la partie",500,250);
+        resume = new StyledButton("Reprendre la partie",500,300);
         resume.getText().setFont(resume.getText().getFont().font(25));
         resume.setOnMouseClicked(e -> primaryStage.setScene(plateau));
 
@@ -173,17 +177,17 @@ public class Main extends Application {
         Group paneOptionScenePause = new Group();
         paneOptionScenePause.getChildren().add(imgVOptionPause);
         settingsScenePause = new Scene (paneOptionScenePause, pl.width,pl.height);
-        settings = new StyledButton("Réglages",500,325);
-        settings.getText().setFont(settings.getText().getFont().font(25));
-        settings.setOnMouseClicked(e -> primaryStage.setScene(settingsScenePause));
-        music = new StyledButton("Musique",500,250);
-        backPause = new StyledButton("Retour",500,325);
-        backPause.setOnMouseClicked(e -> primaryStage.setScene(plateau));
-        paneOptionScenePause.getChildren().addAll(backPause,music);
+       // settings = new StyledButton("Réglages",500,325);
+        //settings.getText().setFont(settings.getText().getFont().font(25));
+        //settings.setOnMouseClicked(e -> primaryStage.setScene(settingsScenePause));
+        //music = new StyledButton("Musique",500,250);
+        //backPause = new StyledButton("Retour",500,325);
+        //backPause.setOnMouseClicked(e -> primaryStage.setScene(plateau));
+        //paneOptionScenePause.getChildren().addAll(backPause,music);
         quit = new StyledButton("Quitter la partie",500,400);
         quit.getText().setFont(quit.getText().getFont().font(25));
         quit.setOnMouseClicked(e -> primaryStage.close());
-        paneScenePause.getChildren().addAll(resume,settings,quit);
+        paneScenePause.getChildren().addAll(resume,quit);
         pauseScene = new Scene (paneScenePause, pl.width,pl.height);
 
 
@@ -244,8 +248,8 @@ public class Main extends Application {
                 }
         );
 
-        AnimationTimer gameloop = new AnimationTimer() {
-            private double timer_game = 0.006;
+       gameloop = new AnimationTimer() {
+            private double timer_game = 0.5;
 
             @Override
             public void handle(long l) {
@@ -305,11 +309,10 @@ public class Main extends Application {
                             stick.setPos((int) billes.get(0).x, (int) billes.get(0).y);
                             pl.changementJoueur();
                         }
-                        System.out.println(enMouvement.size() + "test");
 
                         //supression des billes qui sont tombé
                         for (Circle circle:aSupprimer) {
-                            if(circle.id != 0){
+                             if(circle.id != 0 && circle.id !=5 ){
                                 //Joueur 1 < - Bleu
                                 //Joueur 2 < - Rouge
                                 if(pl.courant == pl.joueur1 ) {
@@ -325,7 +328,20 @@ public class Main extends Application {
                                         ajoutPoint(pl.courant, 150);
                                     }
                                 }
-                            }
+                            }else if (circle.id == 5){
+                                 if (billes.size()>2) {
+                                     status_jeu = Status.DEFAITE;
+                                     drawText("Le Joueur  " + pl.courant.getPseudo() + " a perdu ", 600, 300, 18, context);
+                                     restartButton(context);
+                                 }else {
+                                     ajoutPoint(pl.courant,300);
+                                     status_jeu= Status.VICTOIRE;
+                                 }
+                            }else if (circle.id == 0){
+                                pl.changementJoueur();
+
+                             }
+
                             billes.remove(circle);
                         }
                         // context <- Graphic 2D Canvas
@@ -341,6 +357,7 @@ public class Main extends Application {
                             }
                         }
                         //on reset la list
+                        enMouvement.clear();
                         aSupprimer=new ArrayList<>();
                         verificationVictoire();
 
@@ -370,19 +387,20 @@ public class Main extends Application {
              * */
             public void verificationVictoire(){
                 if(circleBlancPresent()){
-                    if(billes.size() == 1){
-                        for(Circle c: billes){
-                            if(c.id == 0) {
-                                status_jeu = Status.VICTOIRE;
-                                if (pl.joueur1.getScore() > pl.joueur2.getScore()) {
-                                    drawText("Joueur " + pl.joueur1.getPseudo() + " avec " + pl.joueur1.getScore(), 600, 300, 18, context);
+                    if (status_jeu == Status.ENJEU){
+                        if(billes.size() == 1) {
+                            for (Circle c : billes) {
+                                if (c.id == 0) {
+                                    status_jeu = Status.VICTOIRE;
+                                    if (pl.joueur1.getScore() > pl.joueur2.getScore()) {
+                                        drawText("Joueur " + pl.joueur1.getPseudo() + " avec " + pl.joueur1.getScore(), 600, 300, 18, context);
+                                    } else {
+                                        drawText("Joueur " + pl.joueur2.getPseudo() + " avec " + pl.joueur2.getScore(), 600, 300, 18, context);
+                                    }
                                 } else {
-                                    drawText("Joueur " + pl.joueur2.getPseudo() + " avec " + pl.joueur2.getScore(), 600, 300, 18, context);
+                                    status_jeu = Status.DEFAITE;
+                                    restartButton(context);
                                 }
-                            }else if (c.id==15){
-                                status_jeu=Status.DEFAITE;
-                            }else{
-                                status_jeu = Status.DEFAITE;
                             }
                         }
                     }
@@ -453,7 +471,7 @@ public class Main extends Application {
             public int getBouleBleuRestant(){
                 int boule = 0;
                 for (Circle c :billes){
-                    if ( c.id %2 != 0 && c.id != 15 ){
+                    if ( c.id %2 != 0 && c.id != 5 ){
                         boule++;
                     }
                 }
@@ -484,7 +502,7 @@ public class Main extends Application {
         Image imgAccueil = menuImage.chargerImage();
         ImageView imgVAcceuil = new ImageView(imgAccueil);
         paneMenuScene.getChildren().add(imgVAcceuil);
-        play = new StyledButton("Jouer",500,250);
+        play = new StyledButton("Jouer",500,300);
         play.setOnMouseClicked(e->
                 {
                     primaryStage.setScene(plateau);
@@ -492,14 +510,14 @@ public class Main extends Application {
                 }
                 );
         // pour la partie option dans le menu d'acceuil
-        settingsOptions = new StyledButton("Options", 500,325);
+        //settingsOptions = new StyledButton("Options", 500,325);
         MenuAccueil menuImageOption = new MenuAccueil();
         Image imgOption = menuImageOption.chargerImage();
         ImageView imgVOption = new ImageView(imgOption);
         Group paneOptionScene = new Group();
         paneOptionScene.getChildren().add(imgVOption);
         settingsScene = new Scene (paneOptionScene, pl.width,pl.height);
-        settingsOptions.setOnMouseClicked(e -> primaryStage.setScene(settingsScene));
+        //settingsOptions.setOnMouseClicked(e -> primaryStage.setScene(settingsScene));
 
 
         menu= new Scene (paneMenuScene, pl.width,pl.height);
@@ -514,7 +532,7 @@ public class Main extends Application {
 
 
 
-        back = new StyledButton("Retour",500,250);
+       /* back = new StyledButton("Retour",500,250);
         back.setPadding(new Insets(10,10,10,10));
         back.prefHeight(30);
         back.setPrefWidth(250);
@@ -523,10 +541,12 @@ public class Main extends Application {
         back.setOnMouseClicked(e -> primaryStage.setScene(menu));
         paneOptionScene.getChildren().add(back);
         //fin partie option
+        */
+
 
         leave = new StyledButton("Quitter",500, 400);
         leave.setOnMouseClicked(e -> primaryStage.close());
-        paneMenuScene.getChildren().addAll(play,settingsOptions,leave);
+        paneMenuScene.getChildren().addAll(play,leave);
 
         //fin partie acceuil
 
@@ -547,8 +567,8 @@ public class Main extends Application {
     public enum Status{
         MENU(""),
         ENJEU("Bonne chance et bon jeu"),
-        VICTOIRE("Victoir, vous avez gagné !"),
-        DEFAITE("Defaite, vous avez perdu !"),
+        VICTOIRE("Victoire, vous avez gagné !"),
+        DEFAITE("Defaite, Fin de la Partie  !"),
         FINDEPARTIE("Fin de partie ressayez !");
 
         private String s;
@@ -564,6 +584,69 @@ public class Main extends Application {
     public static void main(String[] args) { launch(args);}
 
     public void startGame(GraphicsContext context)throws Exception{
+        startandreseat(context);
+    }
+    /**
+     *Cette fonction affiche du texte
+     * @param String message a afficher
+     * @param int posX position x  sur le plateau
+     *  @param int posY position y  sur le plateau
+     * @param double size la taille d'ecriture
+     * @param context c'est le graphique de la canvas
+     * */
+    public void drawText(String s, int posX, int poxY, double size, GraphicsContext context){
+        context.setFont(new Font("Arial", size));
+        context.setFill(Color.WHITE);
+        context.setLineWidth(3.0);
+        context.fillText(s, posX, poxY);
+    }
+    /**
+     *Cette fonction affiche du texte
+     * @param int posX position x  sur le plateau
+     *  @param int posY position y  sur le plateau
+     * @param int largeur taille  en largeur
+     * @param int hauteur taille  en hauteur
+     * @param context c'est le graphique de la canvas
+     * */
+    private void drawRectangle(GraphicsContext context,int largeur , int hauteur , int posX , int posY ){
+        context.setFill(new Color(0.1, 0.1, 0.1, 0.4));
+        context.fillRect(posX,posY, largeur , hauteur);
+        context.setStroke(Color.BLACK);
+
+    }
+
+    /**
+     *@param context
+     * cette fonction cree un boutton losque la bille
+     * noir rentre dans l'un des trou et retire le boutton
+     * losqu'on clique
+     */
+    private void restartButton(GraphicsContext context){
+        gameloop.stop();
+        StyledButton recommencer = new StyledButton("Recommencer", 700 ,400);
+        root.getChildren().addAll(recommencer);
+        recommencer.setOnMouseClicked(e->
+                {
+                    try {
+                        startandreseat(context);
+                        root.getChildren().removeAll(recommencer);
+                        reseatPartie();
+                        gameloop.start();
+                    }catch (Exception event){
+                        drawText("Une erreur est survenue", 500,400,20,context);
+                    }
+                }
+        );
+    }
+
+    /**
+     *
+     * @param context
+     * @throws Exception
+     * Cette fonction initialise les billes et les placent dans le Plateau
+     */
+
+    private void startandreseat(GraphicsContext context)throws Exception{
         this.billes = new LinkedList<>();
         this.stick = new Stick(300,413);
         billes.add(new Circle(300 ,413,20,0));
@@ -582,38 +665,19 @@ public class Main extends Application {
         billes.add(new Circle(1162,413,20,12));
         billes.add(new Circle(1162,452,20,14));
         billes.add(new Circle(1162,491,20,15));
-
         for(Circle x:billes)x.render(context);
         stick.render(context);
     }
-    /**
-     *Cette fonction affiche du texte
-     * @param String message a afficher
-     * @param int posX position x  sur le plateau
-     *  @param int posY position y  sur le plateau
-     * @param double size la taille d'ecriture
-     * @param context c'est le graphique de la canvas
-     * */
-    public void drawText(String s, int posX, int poxY, double size, GraphicsContext context){
-        context.setFont(new Font("Arial", size));
-        context.setFill(Color.WHITE);
-        context.setLineWidth(3.0);
-        context.fillText(s, posX, poxY);
-    }
 
     /**
-     *Cette fonction affiche du texte
-     * @param int posX position x  sur le plateau
-     *  @param int posY position y  sur le plateau
-     * @param int largeur taille  en largeur
-     * @param int hauteur taille  en hauteur
-     * @param context c'est le graphique de la canvas
-     * */
-    private void drawRectangle(GraphicsContext context,int largeur , int hauteur , int posX , int posY ){
-        context.setFill(new Color(0.1, 0.1, 0.1, 0.4));
-        context.fillRect(posX,posY, largeur , hauteur);
-        context.setStroke(Color.BLACK);
-
+     * Cette fonction sert a initialiser un nouveau
+     * jeu de cero
+     */
+    private void reseatPartie(){
+        status_jeu = Status.ENJEU;
+        pl.joueur1.setScore(0);
+        pl.joueur2.setScore(0);
+        pl.choisirJoueurAlea();
     }
 
 }
