@@ -331,6 +331,9 @@ public class Main extends Application {
                                 status_jeu=Status.DEFAITE;
                                 drawText("Le Joueur  " + pl.courant.getPseudo() + " a perdu " , 600, 300, 18, context);
                                 restartButton(context);
+                            }else if (circle.id ==0 ){
+                                status_jeu=Status.ENJEU;
+                                pl.changementJoueur();
                             }
                             billes.remove(circle);
                         }
@@ -603,6 +606,12 @@ public class Main extends Application {
 
     }
 
+    /**
+     *@param context
+     * cette fonction cree un boutton losque la bille
+     * noir rentre dans l'un des trou et retire le boutton
+     * losqu'on clique
+     */
     private void restartButton(GraphicsContext context){
         StyledButton recommmencer = new StyledButton("Recommencer", 700 ,400);
         root.getChildren().addAll(recommmencer);
@@ -613,11 +622,18 @@ public class Main extends Application {
                         root.getChildren().removeAll(recommmencer);
                         reseatPartie();
                     }catch (Exception event){
-                        drawText("Une erreur est survenue", 500,500,25,context);
+                        drawText("Une erreur est survenue", 500,400,20,context);
                     }
                 }
         );
     }
+
+    /**
+     *
+     * @param context
+     * @throws Exception
+     * Cette fonction initialise les billes et les placent dans le Plateau
+     */
 
     private void startandreseat(GraphicsContext context)throws Exception{
         this.billes = new LinkedList<>();
@@ -643,6 +659,10 @@ public class Main extends Application {
         stick.render(context);
     }
 
+    /**
+     * Cette fonction sert a initialiser un nouveau
+     * jeu de cero
+     */
     private void reseatPartie(){
         status_jeu = Status.ENJEU;
         pl.joueur1.setScore(0);
