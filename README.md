@@ -1,11 +1,8 @@
 # PoolGame
 
 Jeu développé en java avec la bibliothèque javafx pour ressembler au billard américain.
-Il y a deux joueurs avec 15 billes (et la bille blanche) :
--Il y a une bille noir, si elle tombe dans l'un des six trous en dernière c'est la victoire sinon défaite immédiate 
--si il n'y a pas de billes de couleur sur le plateau c'est une victoire selon le score des Joueurs avec un seul Gagnant 
--Si un Joueur met des billes de sa couleurs , il gagne des 150points sinon il perd 300points.
--Chaque joueur jusqu'à la fin de la partie puis ils peuvent recommencer !
+Il y a deux joueurs avec 15 billes, au  début de la partie le joueur commence par frapper la 
+bille blanche et son but et de mettre les billes de l'autre joueur dans les trous chacun son tour.
 
 ## Installation
 
@@ -20,10 +17,25 @@ gradle build
 
 ## Participation
 
-Gabriel :
-Affichage du plateau de jeu, création de la game loop,class circle ,collisions entre billes, collisions contre les murs, disparitions des billes une fois qu'elles passent dans les trous, croquis du menu de jeu, mise en place des billes sur le plateau, class stick, ainsi que l'affichage de la queue sur le plateau et de ses mouvements.
+Gabriel : 
 
 Leticia :
+
+**Ce que j'ai realisé**
+- Ajouter des Joueurs sur le Plateau en tour par tour 
+- Système de défaite/ victoire en fin de partie
+	- Détection de victoire :
+		- si la boule noir entre en dernière , VICTOIRE 
+	- Détection défaite : 
+		- si la boule noir rentre dans un trou (pas en dernier) FIN GAME 
+- Système de Points :
+	- Malus / Bonus des Points  
+- Affichage Graphique  : 
+	- Affichage du Nom Joueurs , Points , boules restants
+	- Affichage de status de la Partie (VICTOIRE , FIN DE JEU , ENJEU, DEFAITE )
+- Boutton recommencer 
+- Reglage du bug de la Queue 
+- Nettoyage du Code 
 
 Marilyn : je me suis occupée de la partie Accueil et Pause du jeu. Tout ce qui est mise en page, action des boutons etc..., Gabriel avait commencé et j'ai continué. Ensuite fallait relier les "Scenes" d'accueil et de pause au reste du jeu. J'ai malheureusement pas réussi à mettre du son dans le jeu après maintes essaies (sûrement un bug sur ma machine). J'ai fait des recherches sur la physique aussi pour tout ce qui est collisions de boule. 
 
