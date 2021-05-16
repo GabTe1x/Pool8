@@ -109,6 +109,8 @@ public class Main extends Application {
 
     private   Plateau pl;
 
+    private AnimationTimer gameloop;
+
     @Override
     public void start(Stage primaryStage) throws Exception{
 
@@ -246,7 +248,7 @@ public class Main extends Application {
                 }
         );
 
-        AnimationTimer gameloop = new AnimationTimer() {
+       gameloop = new AnimationTimer() {
             private double timer_game = 0.5;
 
             @Override
@@ -327,9 +329,14 @@ public class Main extends Application {
                                     }
                                 }
                             }else if (circle.id == 5){
-                                status_jeu=Status.DEFAITE;
-                                drawText("Le Joueur  " + pl.courant.getPseudo() + " a perdu " , 600, 300, 18, context);
-                                restartButton(context);
+                                 if (billes.size()>2) {
+                                     status_jeu = Status.DEFAITE;
+                                     drawText("Le Joueur  " + pl.courant.getPseudo() + " a perdu ", 600, 300, 18, context);
+                                     restartButton(context);
+                                 }else {
+                                     ajoutPoint(pl.courant,300);
+                                     status_jeu= Status.VICTOIRE;
+                                 }
                             }else if (circle.id == 0){
                                 pl.changementJoueur();
 
@@ -615,14 +622,16 @@ public class Main extends Application {
      * losqu'on clique
      */
     private void restartButton(GraphicsContext context){
-        StyledButton recommmencer = new StyledButton("Recommencer", 700 ,400);
-        root.getChildren().addAll(recommmencer);
-        recommmencer.setOnMouseClicked(e->
+        gameloop.stop();
+        StyledButton recommencer = new StyledButton("Recommencer", 700 ,400);
+        root.getChildren().addAll(recommencer);
+        recommencer.setOnMouseClicked(e->
                 {
                     try {
                         startandreseat(context);
-                        root.getChildren().removeAll(recommmencer);
+                        root.getChildren().removeAll(recommencer);
                         reseatPartie();
+                        gameloop.start();
                     }catch (Exception event){
                         drawText("Une erreur est survenue", 500,400,20,context);
                     }
